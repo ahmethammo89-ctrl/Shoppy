@@ -1,463 +1,381 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قالب فاتورة - Invoice Template</title>
+<title>Catering Quotation</title>
 <style>
-  body{margin:0; background:#eef1f4; padding:18px 0 40px;}
-  .page-card{
-    max-width:820px;
-    margin:0 auto;
-    background:#fff;
-    border-radius:10px;
-    box-shadow:0 2px 14px rgba(22,50,79,.12);
-    overflow:hidden;
-  }
-  @media print{
-    body{padding:0;}
-    .page-card{box-shadow:none; border-radius:0;}
-  }
   :root{
-    --ink:#16324f;
-    --ink-soft:#3f5872;
-    --line:#c9d6e3;
-    --paper:#ffffff;
-    --accent:#16324f;
-    --highlight:#fff3b0;
-    --muted:#7c8ea1;
+    --olive:#7d7c4a;
+    --olive-dark:#6b6a3f;
+    --cream:#fdfcf9;
+    --line:#c9c8a0;
+    --text:#2b2b26;
   }
   *{box-sizing:border-box;}
-  .inv-wrap{
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    color:var(--ink);
-    background:var(--paper);
-    max-width:820px;
-    margin:0 auto;
-    padding:28px 22px 60px;
+  body{
+    background:#e9e7de;
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    color:var(--text);
+    margin:0;
+    padding:20px 8px 60px 8px;
   }
   .toolbar{
+    max-width:650px;
+    margin:0 auto 14px auto;
     display:flex;
-    flex-wrap:wrap;
     gap:10px;
-    margin-bottom:22px;
-  }
-  .btn{
-    border:1px solid var(--ink);
-    background:var(--ink);
-    color:#fff;
-    padding:9px 16px;
-    border-radius:7px;
-    font-size:13.5px;
-    font-weight:600;
-    cursor:pointer;
-  }
-  .btn.secondary{
-    background:#fff;
-    color:var(--ink);
-  }
-  .btn.danger{
-    background:#fff;
-    color:#b03030;
-    border-color:#e0b3b3;
-  }
-  .top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    border-bottom:2px solid var(--ink);
-    padding-bottom:16px;
-    margin-bottom:20px;
-  }
-  .co-name{
-    font-size:20px;
-    font-weight:800;
-    letter-spacing:.2px;
-    outline:none;
-    border:none;
-    background:transparent;
-    color:var(--ink);
-    width:100%;
-    padding:2px 0;
-  }
-  .co-line{
-    font-size:12.5px;
-    color:var(--ink-soft);
-    outline:none;
-    border:none;
-    background:transparent;
-    width:100%;
-    padding:1px 0;
-  }
-  .logo-box{
-    width:78px;height:78px;
-    border-radius:50%;
-    border:1px dashed var(--line);
-    display:flex;
-    align-items:center;
     justify-content:center;
-    font-size:10px;
-    color:var(--muted);
-    text-align:center;
-    flex-shrink:0;
-    overflow:hidden;
-    position:relative;
-    cursor:pointer;
-  }
-  .logo-box img{width:100%;height:100%;object-fit:cover;}
-  .logo-input{display:none;}
-  .title-row{
-    text-align:center;
-    margin-bottom:18px;
-  }
-  .title-row .doc-title{
-    font-size:22px;
-    font-weight:800;
-    color:var(--accent);
-    letter-spacing:1px;
-    text-transform:uppercase;
-  }
-  .title-row .doc-date{
-    margin-top:4px;
-    font-size:14px;
-    color:var(--ink-soft);
-    outline:none;
-    border:none;
-    background:transparent;
-    text-align:center;
-    font-weight:600;
-  }
-  .meta{
-    margin-bottom:20px;
-    font-size:14px;
-    line-height:1.9;
-  }
-  .meta-row{
-    display:flex;
-    gap:8px;
-    align-items:baseline;
     flex-wrap:wrap;
   }
-  .meta-row label{
-    font-weight:700;
-    color:var(--accent);
-    white-space:nowrap;
-    font-size:13.5px;
-  }
-  .meta-row input, .meta-row textarea{
-    flex:1;
-    min-width:180px;
-    border:none;
-    border-bottom:1px solid transparent;
-    outline:none;
-    font-size:14px;
-    font-family:inherit;
-    color:var(--ink);
-    background:transparent;
-    padding:2px 4px;
-    resize:none;
-  }
-  .meta-row input:focus, .meta-row textarea:focus{border-bottom:1px solid var(--line);}
-  table{
-    width:100%;
-    border-collapse:collapse;
-    margin-bottom:6px;
-    font-size:14px;
-  }
-  thead th{
-    background:var(--accent);
+  .toolbar button{
+    background:var(--olive);
     color:#fff;
-    text-align:left;
-    padding:10px 10px;
-    font-size:12.5px;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-  }
-  thead th.num, tbody td.num{text-align:right;}
-  tbody td{
-    border-bottom:1px solid var(--line);
-    padding:8px 10px;
-    vertical-align:middle;
-  }
-  tbody input{
-    width:100%;
     border:none;
-    outline:none;
-    background:transparent;
-    font-size:14px;
-    font-family:inherit;
-    color:var(--ink);
-    padding:2px;
-  }
-  tbody input.num{text-align:right;}
-  .subtotal-cell{
-    text-align:right;
-    font-weight:600;
-    white-space:nowrap;
-  }
-  .row-del{
-    background:none;
-    border:none;
-    color:#b03030;
+    padding:12px 18px;
+    border-radius:8px;
+    font-size:15px;
     cursor:pointer;
-    font-size:16px;
-    line-height:1;
-    padding:2px 6px;
   }
-  .add-row-btn{
-    margin:10px 0 22px;
-    font-size:13px;
-    padding:7px 14px;
-  }
-  .totals{
-    width:100%;
-    max-width:340px;
-    margin-left:auto;
-    font-size:14px;
-  }
-  .totals-row{
-    display:flex;
-    justify-content:space-between;
-    padding:7px 10px;
-    border-bottom:1px solid var(--line);
-  }
-  .totals-row label{color:var(--ink-soft); font-weight:600;}
-  .totals-row .val{font-weight:600;}
-  .totals-row.vat-rate input{
-    width:44px;
-    border:none;
-    border-bottom:1px solid var(--line);
+  .toolbar button:hover{background:var(--olive-dark);}
+  .hint{
+    max-width:650px;
+    margin:0 auto 16px auto;
     text-align:center;
-    outline:none;
     font-size:13px;
-    font-family:inherit;
-  }
-  .totals-row.grand{
-    background:var(--accent);
-    color:#fff;
-    border-radius:6px;
-    border:none;
-    font-size:16px;
-    margin-top:6px;
-    padding:10px 12px;
-  }
-  .totals-row.grand .val{
-    background:var(--highlight);
-    color:var(--ink);
-    padding:2px 10px;
-    border-radius:4px;
-  }
-  .footer-note{
-    margin-top:34px;
-    text-align:right;
-    font-size:12.5px;
-    color:var(--ink-soft);
-    line-height:1.7;
-  }
-  .footer-note input{
-    text-align:right;
-    border:none;
-    outline:none;
-    background:transparent;
-    font-size:12.5px;
-    color:var(--ink-soft);
-    width:100%;
-    font-family:inherit;
-    padding:1px 0;
-  }
-  .curr-select{
-    font-size:12px;
-    border:1px solid var(--line);
-    border-radius:5px;
-    padding:4px 6px;
-    background:#fff;
-    color:var(--ink);
+    color:#666;
   }
 
-  @media (max-width:600px){
-    .inv-wrap{padding:16px 10px 50px;}
-    table, thead, tbody, tr, th, td{display:block;}
-    thead{display:none;}
-    tbody tr{
-      border:1px solid var(--line);
-      border-radius:8px;
-      margin-bottom:10px;
-      padding:8px 10px;
-      position:relative;
-    }
-    tbody td{border:none; padding:4px 2px;}
-    tbody td::before{
-      content:attr(data-label);
-      display:block;
-      font-size:10.5px;
-      text-transform:uppercase;
-      color:var(--muted);
-      font-weight:700;
-      margin-bottom:2px;
-    }
-    .row-del{position:absolute; top:6px; left:6px;}
+  /* ---------- EDIT FORM ---------- */
+  .form-wrap{
+    max-width:650px;
+    margin:0 auto;
+    background:var(--cream);
+    border:1px solid var(--olive);
+    border-radius:10px;
+    padding:18px;
   }
+  .form-section{
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+  }
+  .form-section:last-child{border-bottom:none;}
+  .form-section h3{
+    margin:0 0 10px 0;
+    color:var(--olive-dark);
+    font-size:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .form-section input.icon-input{
+    width:44px;
+    text-align:center;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 0;
+    font-size:18px;
+    margin-right:6px;
+  }
+  .form-section input.title-input{
+    flex:1;
+    font-weight:700;
+    font-size:15px;
+    color:var(--olive-dark);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 10px;
+    font-family:inherit;
+  }
+  textarea.items{
+    width:100%;
+    min-height:100px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px;
+    font-size:15px;
+    font-family:inherit;
+    resize:vertical;
+    line-height:1.5;
+  }
+  .remove-btn{
+    background:#fff0f0;
+    color:#b33;
+    border:1px solid #e3b8b8;
+    border-radius:6px;
+    padding:6px 10px;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    margin-left:8px;
+  }
+  .add-section-btn{
+    width:100%;
+    margin-top:14px;
+    background:#fff;
+    border:1px dashed var(--olive);
+    color:var(--olive-dark);
+    padding:12px;
+    border-radius:8px;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .row2{display:flex;gap:8px;margin-bottom:10px;align-items:center;}
+  .pricing-row{display:flex;gap:8px;margin-bottom:8px;}
+  .pricing-row input{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:15px;
+    font-family:inherit;
+  }
+  .pricing-row input.amount{max-width:130px;}
+  .delivery-field{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:15px;
+    font-family:inherit;
+    margin-bottom:8px;
+  }
+  label.small-label{
+    font-size:12px;
+    color:#888;
+    display:block;
+    margin-bottom:2px;
+  }
+
+  /* ---------- PRINT SHEET ---------- */
+  #printSheet{
+    display:none;
+    max-width:650px;
+    margin:20px auto 0 auto;
+    background:var(--cream);
+    border:1px solid var(--olive);
+    border-radius:10px;
+    padding:6px;
+  }
+  #printSheet.visible{display:block;}
+  .sheet-inner{
+    border:1px solid var(--olive);
+    padding:30px 25px 20px 25px;
+  }
+  .logo{text-align:center;margin-bottom:6px;}
+  .logo img{max-width:220px;height:auto;}
+  h1.p-title{
+    text-align:center;font-size:22px;letter-spacing:1px;color:var(--olive-dark);
+    margin:16px 0;display:flex;align-items:center;gap:12px;
+  }
+  h1.p-title::before, h1.p-title::after{content:"";flex:1;height:1px;background:var(--olive);}
+  .p-section-header{
+    background:var(--olive);color:#fff;padding:10px 16px;border-radius:6px;
+    font-weight:700;letter-spacing:.5px;margin:16px 0 12px 0;font-size:14px;
+  }
+  .p-block{display:flex;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);}
+  .p-icon{
+    width:36px;height:36px;border-radius:50%;background:var(--olive);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+  }
+  .p-block-content h3{margin:0 0 6px 0;color:var(--olive-dark);font-size:14.5px;}
+  .p-block-content div.items{font-size:13.5px;line-height:1.6;}
+  table.p-pricing{width:100%;border-collapse:collapse;margin-top:18px;font-size:13.5px;}
+  table.p-pricing thead td{background:var(--olive);color:#fff;font-weight:700;padding:9px 12px;}
+  table.p-pricing tbody td{padding:9px 12px;border-bottom:1px solid var(--line);}
+  table.p-pricing tr.grand td{background:#f1f0e6;font-weight:800;}
+  .p-footer{text-align:center;margin-top:16px;color:var(--olive);letter-spacing:3px;}
 
   @media print{
-    .toolbar, .row-del, .add-row-btn, .logo-box{ -webkit-print-color-adjust:exact; print-color-adjust:exact;}
-    .toolbar, .add-row-btn{display:none !important;}
-    body{background:#fff;}
-    .inv-wrap{max-width:100%; padding:0;}
-    .logo-box{border:none;}
-    thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-    .totals-row.grand{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-    body{background:#fff;}
+    body{background:#fff;padding:0;}
+    .toolbar,.hint,.form-wrap{display:none !important;}
+    #printSheet{display:block !important;max-width:100%;margin:0;border:none;}
+    .sheet-inner{border:1px solid var(--olive);}
   }
 </style>
 </head>
 <body>
 
-<div class="page-card">
-<div class="inv-wrap" id="invoice">
   <div class="toolbar">
-    <button class="btn" type="button" data-action="print">⬇ تصدير PDF / طباعة</button>
-    <button class="btn secondary" type="button" data-action="add-row">+ إضافة صنف</button>
-    <button class="btn secondary" type="button" data-action="reset">تصفير الكميات</button>
+    <button onclick="showPreview()">👁️ Preview Quotation</button>
+    <button onclick="window.print()">🖨️ Save as PDF</button>
   </div>
+  <div class="hint">عبّي الحقول تحت، دوس "Preview" لتشوف الشكل النهائي تحت. إذا زر "Save as PDF" ما فتح شي (بيصير أحياناً بمتصفح الموبايل داخل التطبيق)، افتح الملف من Safari أو Chrome مباشرة، وبعدين استخدم خيار "Share" أو "Print" من قائمة المتصفح نفسه واختار Save as PDF.</div>
 
-  <div class="top">
-    <div style="flex:1;">
-      <input class="co-name" value="" placeholder="اسم الشركة">
-      <input class="co-line" value="" placeholder="MOF">
-      <input class="co-line" value="" placeholder="رقم VAT">
+  <div class="form-wrap" id="formWrap">
+
+    <div class="form-section">
+      <label class="small-label">Quotation title</label>
+      <input class="delivery-field" id="quoteTitle" value="CATERING QUOTATION">
     </div>
-    <div class="logo-box" id="logoBox">
-      الشعار
+
+    <div class="form-section">
+      <label class="small-label">Section header title</label>
+      <div class="row2">
+        <input class="icon-input" id="mainIcon" value="🍽️">
+        <input class="title-input" id="mainTitle" value="STANDING BUFFET (FINGER FOOD / BOUCHEES)">
+      </div>
+    </div>
+
+    <div id="sectionsContainer"></div>
+
+    <button class="add-section-btn" onclick="addSection()">＋ Add Section</button>
+
+    <div class="form-section">
+      <h3>Delivery Details</h3>
+      <div class="row2">
+        <input class="icon-input" id="deliveryIcon" value="🚚">
+        <label class="small-label" style="margin:0;">icon</label>
+      </div>
+      <label class="small-label">Delivery time</label>
+      <input class="delivery-field" id="deliveryTime" value="Delivery will be made by 10:30 AM to:">
+      <label class="small-label">Location line 1</label>
+      <input class="delivery-field" id="deliveryLine1" value='Starco Building – Bloc "A" – 5th Floor'>
+      <label class="small-label">Location line 2</label>
+      <input class="delivery-field" id="deliveryLine2" value="Office of the Minister of State for Administrative Reform (OMSAR)">
+    </div>
+
+    <div class="form-section">
+      <h3>Pricing</h3>
+      <div class="pricing-row">
+        <input placeholder="Label" value="Total" id="p1label">
+        <input class="amount" placeholder="Amount" value="175 USD" id="p1amount">
+      </div>
+      <div class="pricing-row">
+        <input placeholder="Label" value="VAT" id="p2label">
+        <input class="amount" placeholder="Amount" value="19 USD" id="p2amount">
+      </div>
+      <div class="pricing-row">
+        <input placeholder="Label" value="GRAND TOTAL (INCLUDING VAT)" id="p3label">
+        <input class="amount" placeholder="Amount" value="194 USD" id="p3amount">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="small-label">Footer symbol (leave blank to remove)</label>
+      <input class="delivery-field" id="footerText" value="• 🌿 •">
+    </div>
+
+  </div>
+
+  <!-- PRINT VERSION (built from the form fields right before printing) -->
+  <div id="printSheet">
+    <div class="sheet-inner">
+      <div class="logo">
+        <img src="data:image/jpeg;base64,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" alt="Shoppy logo">
+      </div>
+      <h1 class="p-title" id="out-quoteTitle"></h1>
+      <div class="p-section-header" id="out-mainHeader"></div>
+      <div id="out-sections"></div>
+      <div class="p-block">
+        <div class="p-icon" id="out-deliveryIcon"></div>
+        <div class="p-block-content">
+          <h3>DELIVERY DETAILS:</h3>
+          <div class="items" id="out-delivery"></div>
+        </div>
+      </div>
+      <table class="p-pricing">
+        <thead><tr><td>PRICING:</td><td style="text-align:right">AMOUNT (USD)</td></tr></thead>
+        <tbody id="out-pricing"></tbody>
+      </table>
+      <div class="p-footer" id="out-footer"></div>
     </div>
   </div>
-
-  <div class="title-row">
-    <div class="doc-title">فاتورة / Invoice</div>
-    <input class="doc-date" type="text" value="" placeholder="التاريخ">
-  </div>
-
-  <div class="meta">
-    <div class="meta-row"><label>رقم الفاتورة:</label><input type="text" value="" placeholder=""></div>
-    <div class="meta-row"><label>Invoice to:</label><input type="text" value="" placeholder=""></div>
-    <div class="meta-row"><label>Location:</label><textarea rows="1" placeholder=""></textarea></div>
-    <div class="meta-row"><label>MOF:</label><input type="text" value="" placeholder=""></div>
-    <div class="meta-row"><label>Phone:</label><input type="text" value="" placeholder=""></div>
-  </div>
-
-  <table id="itemsTable">
-    <thead>
-      <tr>
-        <th style="width:34px;"></th>
-        <th>الصنف / Item</th>
-        <th class="num" style="width:110px;">سعر الوحدة</th>
-        <th class="num" style="width:70px;">الكمية</th>
-        <th class="num" style="width:110px;">المجموع</th>
-      </tr>
-    </thead>
-    <tbody id="itemsBody"></tbody>
-  </table>
-
-  <button class="btn secondary add-row-btn" type="button" data-action="add-row">+ إضافة صنف</button>
-
-  <div class="totals">
-    <div class="totals-row">
-      <label>TOTAL VATABLE</label>
-      <span class="val" id="subtotalVal">0.000</span>
-    </div>
-    <div class="totals-row vat-rate">
-      <label>VAT <input type="number" id="vatRate" value="11" min="0" step="0.1">%</label>
-      <span class="val" id="vatVal">0.000</span>
-    </div>
-    <div class="totals-row grand">
-      <label>Grand Total</label>
-      <span class="val" id="grandVal">0.000</span>
-    </div>
-  </div>
-
-  <div class="footer-note">
-    <input type="text" value="" placeholder="اسم الشركة">
-    <input type="text" value="" placeholder="العنوان">
-    <input type="text" value="" placeholder="رقم الهاتف">
-  </div>
-</div>
-</div>
 
 <script>
-  const seedItems = [
-    ["", "", ""],
-  ];
+let sectionCount = 0;
+const defaultSections = [
+  {icon:"🥗", title:"SAVORY SELECTION:", items:
+`Mini baguette (white): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
+Mini baguette (brown): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
+Savory pastries (Spinach Fatayer): 50 pcs`},
+  {icon:"🧁", title:"SWEET SELECTION:", items:
+`Mini chocolate croissants: 18 pcs
+Mini donuts: 18 pcs`},
+  {icon:"🥤", title:"BEVERAGES:", items:
+`2 bottles of orange juice (processed)`}
+];
 
-  const body = document.getElementById('itemsBody');
+function addSection(icon="🍴", title="NEW SECTION:", items="Item name: quantity"){
+  sectionCount++;
+  const id = sectionCount;
+  const div = document.createElement('div');
+  div.className = 'form-section';
+  div.id = 'section-' + id;
+  div.innerHTML = `
+    <div class="row2">
+      <input class="icon-input" id="icon-${id}" value="${icon}">
+      <input class="title-input" id="title-${id}" value="${title}">
+      <button class="remove-btn" onclick="document.getElementById('section-${id}').remove()">✕ remove</button>
+    </div>
+    <label class="small-label">Items (one per line)</label>
+    <textarea class="items" id="items-${id}">${items}</textarea>
+  `;
+  document.getElementById('sectionsContainer').appendChild(div);
+}
 
-  function rowTemplate(name="", price="", qty=""){
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td data-label=""><button class="row-del" type="button" data-action="del-row">✕</button></td>
-      <td data-label="الصنف"><input type="text" class="item-name" value="${name}" placeholder="اسم الصنف"></td>
-      <td data-label="سعر الوحدة" class="num"><input type="number" step="0.001" inputmode="decimal" class="num item-price" value="${price}"></td>
-      <td data-label="الكمية" class="num"><input type="number" step="1" inputmode="decimal" class="num item-qty" value="${qty}"></td>
-      <td data-label="المجموع" class="subtotal-cell item-sub">0.000</td>
-    `;
-    return tr;
+defaultSections.forEach(s => addSection(s.icon, s.title, s.items));
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildPrintView(){
+  document.getElementById('out-quoteTitle').textContent =
+    document.getElementById('quoteTitle').value;
+
+  document.getElementById('out-mainHeader').textContent =
+    document.getElementById('mainIcon').value + ' ' + document.getElementById('mainTitle').value;
+
+  document.getElementById('out-deliveryIcon').textContent =
+    document.getElementById('deliveryIcon').value;
+
+  document.getElementById('out-footer').textContent =
+    document.getElementById('footerText').value;
+
+  const container = document.getElementById('out-sections');
+  container.innerHTML = '';
+  for(let i=1; i<=sectionCount; i++){
+    const iconEl = document.getElementById('icon-'+i);
+    if(!iconEl) continue;
+    const icon = iconEl.value;
+    const title = document.getElementById('title-'+i).value;
+    const items = document.getElementById('items-'+i).value;
+    const lines = items.split('\n').filter(l => l.trim() !== '');
+    const listHtml = lines.map(l => '• ' + escapeHtml(l)).join('<br>');
+    const block = document.createElement('div');
+    block.className = 'p-block';
+    block.innerHTML = `
+      <div class="p-icon">${icon}</div>
+      <div class="p-block-content">
+        <h3>${escapeHtml(title)}</h3>
+        <div class="items">${listHtml}</div>
+      </div>`;
+    container.appendChild(block);
   }
 
-  function addRow(name, price, qty){
-    body.appendChild(rowTemplate(name||"", price!==undefined?price:"", qty!==undefined?qty:""));
-    recalc();
-  }
+  document.getElementById('out-delivery').innerHTML =
+    escapeHtml(document.getElementById('deliveryTime').value) + '<br>' +
+    '<b>' + escapeHtml(document.getElementById('deliveryLine1').value) + '</b><br>' +
+    '<b>' + escapeHtml(document.getElementById('deliveryLine2').value) + '</b>';
 
-  function delRow(btn){
-    btn.closest('tr').remove();
-    recalc();
-  }
+  const pricingBody = document.getElementById('out-pricing');
+  pricingBody.innerHTML = `
+    <tr><td>${escapeHtml(document.getElementById('p1label').value)}</td><td style="text-align:right">${escapeHtml(document.getElementById('p1amount').value)}</td></tr>
+    <tr><td>${escapeHtml(document.getElementById('p2label').value)}</td><td style="text-align:right">${escapeHtml(document.getElementById('p2amount').value)}</td></tr>
+    <tr class="grand"><td>${escapeHtml(document.getElementById('p3label').value)}</td><td style="text-align:right">${escapeHtml(document.getElementById('p3amount').value)}</td></tr>
+  `;
+}
 
-  function resetAmounts(){
-    document.querySelectorAll('.item-qty').forEach(i => i.value = 0);
-    recalc();
-  }
+window.addEventListener('beforeprint', buildPrintView);
 
-  function fmt(n){
-    return n.toLocaleString('en-US', {minimumFractionDigits:3, maximumFractionDigits:3});
-  }
-
-  function recalc(){
-    let subtotal = 0;
-    document.querySelectorAll('#itemsBody tr').forEach(tr => {
-      const price = parseFloat(tr.querySelector('.item-price').value) || 0;
-      const qty = parseFloat(tr.querySelector('.item-qty').value) || 0;
-      const sub = price * qty;
-      tr.querySelector('.item-sub').textContent = fmt(sub);
-      subtotal += sub;
-    });
-    const vatRate = parseFloat(document.getElementById('vatRate').value) || 0;
-    const vat = subtotal * (vatRate/100);
-    const grand = subtotal + vat;
-    document.getElementById('subtotalVal').textContent = fmt(subtotal);
-    document.getElementById('vatVal').textContent = fmt(vat);
-    document.getElementById('grandVal').textContent = fmt(grand);
-  }
-
-  document.getElementById('vatRate').addEventListener('input', recalc);
-
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('[data-action]');
-    if(!btn) return;
-    const action = btn.getAttribute('data-action');
-    if(action === 'print'){ window.print(); }
-    else if(action === 'add-row'){ addRow(); }
-    else if(action === 'reset'){ resetAmounts(); }
-    else if(action === 'del-row'){ delRow(btn); }
-  });
-
-  document.addEventListener('input', function(e){
-    if(e.target.classList.contains('item-price') || e.target.classList.contains('item-qty')){
-      recalc();
-    }
-  });
-
-  seedItems.forEach(([n,p,q]) => addRow(n,p,q));
-  recalc();
+function showPreview(){
+  buildPrintView();
+  const sheet = document.getElementById('printSheet');
+  sheet.classList.add('visible');
+  sheet.scrollIntoView({behavior:'smooth', block:'start'});
+}
 </script>
+
 </body>
 </html>
