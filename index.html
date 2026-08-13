@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catering Quotation</title>
+<title>Professional Invoice & Quotation</title>
 <style>
   :root{
     --olive:#7d7c4a;
@@ -11,9 +11,8 @@
     --cream:#fdfcf9;
     --line:#c9c8a0;
     --text:#2b2b26;
-    --print-font-size:15px;
+    --print-font-size:14px;
     --print-font-weight:400;
-    --numbers-color:#000000;
   }
   *{box-sizing:border-box;}
   body{
@@ -24,7 +23,7 @@
     padding:20px 8px 60px 8px;
   }
   .toolbar{
-    max-width:650px;
+    max-width:700px;
     margin:0 auto 14px auto;
     display:flex;
     gap:10px;
@@ -39,10 +38,12 @@
     border-radius:8px;
     font-size:15px;
     cursor:pointer;
+    font-weight:600;
+    transition: background 0.3s;
   }
   .toolbar button:hover{background:var(--olive-dark);}
   .hint{
-    max-width:650px;
+    max-width:700px;
     margin:0 auto 16px auto;
     text-align:center;
     font-size:13px;
@@ -51,22 +52,22 @@
 
   /* ---------- EDIT FORM ---------- */
   .form-wrap{
-    max-width:650px;
+    max-width:700px;
     margin:0 auto;
     background:var(--cream);
     border:1px solid var(--olive);
     border-radius:10px;
-    padding:18px;
+    padding:20px;
   }
   .form-section{
     border-bottom:1px solid var(--line);
-    padding:14px 0;
+    padding:16px 0;
   }
   .form-section:last-child{border-bottom:none;}
   .form-section h3{
-    margin:0 0 10px 0;
+    margin:0 0 12px 0;
     color:var(--olive-dark);
-    font-size:15px;
+    font-size:16px;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -90,9 +91,8 @@
     padding:8px 10px;
     font-family:inherit;
   }
-  textarea.items{
+  textarea.items, textarea.terms{
     width:100%;
-    min-height:100px;
     border:1px solid var(--line);
     border-radius:6px;
     padding:10px;
@@ -101,6 +101,9 @@
     resize:vertical;
     line-height:1.5;
   }
+  textarea.items{ min-height:100px; }
+  textarea.terms{ min-height:70px; }
+  
   .remove-btn{
     background:#fff0f0;
     color:#b33;
@@ -122,8 +125,10 @@
     border-radius:8px;
     font-size:14px;
     cursor:pointer;
+    font-weight:600;
   }
   .row2{display:flex;gap:8px;margin-bottom:10px;align-items:center;}
+  .grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;}
   .pricing-row{display:flex;gap:8px;margin-bottom:8px;}
   .pricing-row input{
     flex:1;
@@ -133,8 +138,8 @@
     font-size:15px;
     font-family:inherit;
   }
-  .pricing-row input.amount{max-width:130px;}
-  .delivery-field{
+  .pricing-row input.amount{max-width:140px;}
+  .input-field{
     width:100%;
     border:1px solid var(--line);
     border-radius:6px;
@@ -145,9 +150,10 @@
   }
   label.small-label{
     font-size:12px;
-    color:#888;
+    color:#666;
     display:block;
-    margin-bottom:2px;
+    margin-bottom:3px;
+    font-weight:600;
   }
   .style-row{
     display:flex;
@@ -181,44 +187,134 @@
   /* ---------- PRINT SHEET ---------- */
   #printSheet{
     display:none;
-    max-width:650px;
+    max-width:750px; /* جعلت العرض أكبر قليلاً ليناسب الفواتير الرسمية */
     margin:20px auto 0 auto;
-    background:var(--cream);
+    background:#fff;
     border:1px solid var(--olive);
     border-radius:10px;
-    padding:6px;
+    padding:10px;
   }
   #printSheet.visible{display:block;}
   .sheet-inner{
     border:1px solid var(--olive);
-    padding:30px 25px 20px 25px;
+    padding:40px 35px 30px 35px;
     font-size:var(--print-font-size);
   }
-  .logo{text-align:center;margin-bottom:6px;}
-  .logo img{max-width:220px;height:auto;}
-  h1.p-title{
-    text-align:center;font-size:1.55em;letter-spacing:1px;color:var(--olive-dark);
-    margin:16px 0;display:flex;align-items:center;gap:12px;font-weight:700;
+  
+  /* Header Layout */
+  .p-header-layout{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-bottom:2px solid var(--olive);
+    padding-bottom:15px;
+    margin-bottom:25px;
   }
-  h1.p-title::before, h1.p-title::after{content:"";flex:1;height:1px;background:var(--olive);}
+  .p-logo img{max-width:200px;height:auto;}
+  .p-meta-info{text-align:right;}
+  .p-meta-info h1{
+    margin:0 0 10px 0;
+    color:var(--olive-dark);
+    font-size:2em;
+    font-weight:800;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .p-meta-table{
+    border-collapse:collapse;
+    margin-left:auto;
+  }
+  .p-meta-table td{
+    padding:3px 0 3px 15px;
+    font-size:0.95em;
+  }
+  .p-meta-table td.label{
+    font-weight:700;
+    color:var(--olive-dark);
+  }
+
+  /* Client & Delivery Grid */
+  .p-info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:30px;
+  }
+  .p-info-box h3{
+    margin:0 0 8px 0;
+    color:var(--olive-dark);
+    font-size:1.1em;
+    border-bottom:1px solid var(--line);
+    padding-bottom:4px;
+  }
+  .p-info-box p{
+    margin:4px 0;
+    font-size:0.95em;
+    line-height:1.4;
+  }
+  
+  /* Main Content Setup */
   .p-section-header{
     background:var(--olive);color:#fff;padding:10px 16px;border-radius:6px;
     font-weight:700;letter-spacing:.5px;margin:16px 0 12px 0;font-size:1em;
   }
-  .p-block{display:flex;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);}
+  .p-block{
+    display:flex;
+    gap:10px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--line);
+    page-break-inside: avoid; /* يمنع انقسام القسم بين صفحتين عند الطباعة */
+  }
   .p-icon{
-    width:36px;height:36px;border-radius:50%;background:var(--olive);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:1.15em;flex-shrink:0;
+    width:24px;
+    color:var(--text);
+    font-size:1.1em;
+    font-weight:700;
+    flex-shrink:0;
+    padding-top:1px;
   }
   .p-block-content h3{margin:0 0 6px 0;color:var(--olive-dark);font-size:1.03em;font-weight:700;}
   .p-block-content div.items{font-size:0.95em;line-height:1.6;font-weight:var(--print-font-weight);}
-  table.p-pricing{width:100%;border-collapse:collapse;margin-top:18px;font-size:0.93em;}
-  table.p-pricing thead td{background:var(--olive);color:#fff;font-weight:700;padding:9px 12px;}
-  table.p-pricing tbody td{padding:9px 12px;border-bottom:1px solid var(--line);font-weight:var(--print-font-weight);}
-  table.p-pricing tbody td.amt{color:var(--numbers-color);font-weight:600;}
-  table.p-pricing tr.grand td{background:#f1f0e6;font-weight:700 !important;}
-  table.p-pricing tr.grand td.amt{color:var(--numbers-color);font-weight:800 !important;}
-  .p-footer{text-align:center;margin-top:16px;color:var(--olive);letter-spacing:3px;}
+  
+  /* Pricing Table */
+  .p-pricing-container{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:20px;
+    page-break-inside: avoid;
+  }
+  table.p-pricing{
+    width:50%;
+    min-width:300px;
+    border-collapse:collapse;
+    font-size:0.95em;
+  }
+  table.p-pricing td{
+    padding:8px 12px;
+    border-bottom:1px solid var(--line);
+    font-weight:var(--print-font-weight);
+  }
+  table.p-pricing td:first-child{font-weight:600;}
+  table.p-pricing td.amt{text-align:right; color:var(--text);}
+  table.p-pricing tr.grand td{
+    background:var(--olive);
+    color:#fff;
+    font-weight:700 !important;
+    border:none;
+  }
+  table.p-pricing tr.grand td.amt{color:#fff;}
+  
+  /* Terms & Footer */
+  .p-terms{
+    margin-top:30px;
+    padding-top:15px;
+    border-top:1px solid var(--line);
+    font-size:0.85em;
+    line-height:1.5;
+    page-break-inside: avoid;
+  }
+  .p-terms h4{margin:0 0 5px 0; color:var(--olive-dark);}
+  .p-footer{text-align:center;margin-top:30px;color:var(--olive);letter-spacing:3px;}
 
   @page{
     margin:10mm;
@@ -227,58 +323,120 @@
     html, body{background:#fff;padding:0;margin:0;}
     .toolbar,.hint,.form-wrap{display:none !important;}
     #printSheet{display:block !important;max-width:100%;margin:0;border:none;padding:0;}
-    .sheet-inner{border:1px solid var(--olive);}
+    .sheet-inner{border:none; padding:0;}
   }
 </style>
 </head>
 <body>
 
   <div class="toolbar">
-    <button onclick="showPreview()">👁️ Preview Quotation</button>
-    <button onclick="window.print()">🖨️ Save as PDF</button>
+    <button onclick="showPreview()">👁️ Preview Document</button>
+    <button onclick="window.print()">🖨️ Save as PDF / Print</button>
   </div>
-  <div class="hint">عبّي الحقول تحت، دوس "Preview" لتشوف الشكل النهائي تحت. لما تدوس "Save as PDF" رح يفتحلك المتصفح خيار الطباعة، ومن جوا هاد الخيار: اختار "Save as PDF" (بيصير PDF) أو اختار طابعة (بيطبع ورق). ⚠️ إذا طلعلك اسم الموقع أو التاريخ فوق/تحت الورقة: دوس "More settings" بنافذة الطباعة وفضّي/بطّل خيار "Headers and footers" — هيك بتطلع الفاتورة لحالها بس.</div>
+  <div class="hint">املأ الحقول أدناه لتجهيز فاتورتك أو عرض السعر. اضغط "Preview" للمعاينة. عند الطباعة (Save as PDF)، تأكد من إيقاف خيار "Headers and footers" من إعدادات المتصفح لضمان نظافة الورقة.</div>
 
   <div class="form-wrap" id="formWrap">
 
     <div class="form-section">
-      <h3>Style</h3>
+      <h3>🎨 Visual Style</h3>
       <div class="style-row">
         <div class="style-field">
           <label class="small-label">Font size</label>
           <select id="fontSizeSelect" onchange="updateStyleVars()">
             <option value="13">Small</option>
-            <option value="15" selected>Medium</option>
-            <option value="17">Large</option>
-            <option value="19">Extra Large</option>
+            <option value="14" selected>Medium</option>
+            <option value="16">Large</option>
           </select>
         </div>
         <div class="style-field">
           <label class="small-label">Font weight</label>
           <select id="fontWeightSelect" onchange="updateStyleVars()">
             <option value="400" selected>Normal</option>
+            <option value="500">Medium</option>
             <option value="600">Semi-Bold</option>
-            <option value="700">Bold</option>
           </select>
         </div>
         <div class="style-field">
-          <label class="small-label">Accent color</label>
+          <label class="small-label">Theme Color</label>
           <input type="color" id="accentColor" value="#7d7c4a" oninput="updateStyleVars()">
-        </div>
-        <div class="style-field">
-          <label class="small-label">Numbers color</label>
-          <input type="color" id="numbersColor" value="#000000" oninput="updateStyleVars()">
         </div>
       </div>
     </div>
 
     <div class="form-section">
-      <label class="small-label">Quotation title</label>
-      <input class="delivery-field" id="quoteTitle" value="CATERING QUOTATION">
+      <h3>📄 Document Details</h3>
+      <div class="grid-2col">
+        <div>
+          <label class="small-label">Document Type</label>
+          <select class="input-field" id="docType" onchange="document.getElementById('quoteTitle').value = this.value">
+            <option value="INVOICE">Invoice (فاتورة)</option>
+            <option value="QUOTATION" selected>Quotation (عرض سعر)</option>
+            <option value="PROFORMA INVOICE">Proforma Invoice</option>
+          </select>
+        </div>
+        <div>
+          <label class="small-label">Title override (Optional)</label>
+          <input class="input-field" id="quoteTitle" value="QUOTATION">
+        </div>
+      </div>
+      
+      <div class="grid-2col">
+        <div>
+          <label class="small-label">Document Number</label>
+          <input class="input-field" id="docNumber" value="QT-2026-0801">
+        </div>
+        <div>
+          <label class="small-label">Date</label>
+          <input class="input-field" id="docDate" value="13 August 2026">
+        </div>
+      </div>
+      
+      <div class="grid-2col">
+        <div>
+          <label class="small-label">Company MOF #</label>
+          <input class="input-field" id="mofNumber" value="3847291">
+        </div>
+        <div>
+          <label class="small-label">Company TVA #</label>
+          <input class="input-field" id="tvaNumber" value="8839-T">
+        </div>
+      </div>
     </div>
 
     <div class="form-section">
-      <label class="small-label">Section header title</label>
+      <h3>👤 Client Details (Bill To)</h3>
+      <label class="small-label">Client Name / Company</label>
+      <input class="input-field" id="clientName" value="Ministry of State for Administrative Reform">
+      <div class="grid-2col">
+        <div>
+          <label class="small-label">Phone</label>
+          <input class="input-field" id="clientPhone" value="+961 1 XXXXXX">
+        </div>
+        <div>
+          <label class="small-label">Email / Contact Person</label>
+          <input class="input-field" id="clientEmail" value="Attn: Mr. Ahmad">
+        </div>
+      </div>
+      <label class="small-label">Address</label>
+      <input class="input-field" id="clientAddress" value="Beirut, Lebanon">
+    </div>
+
+    <div class="form-section">
+      <h3>🚚 Event / Delivery Details</h3>
+      <div class="row2">
+        <input class="icon-input" id="deliveryIcon" value="📌">
+        <input class="title-input" id="deliveryTitle" value="Event Logistics">
+      </div>
+      <label class="small-label">Timing / Date</label>
+      <input class="input-field" id="deliveryTime" value="Thursday, 20 August 2026 at 10:30 AM">
+      <label class="small-label">Location</label>
+      <input class="input-field" id="deliveryLine1" value='Starco Building – Bloc "A" – 5th Floor'>
+      <label class="small-label">Notes</label>
+      <input class="input-field" id="deliveryLine2" value="Setup required 1 hour prior to event.">
+    </div>
+
+    <div class="form-section">
+      <h3>🛒 Products / Services</h3>
       <div class="row2">
         <input class="icon-input" id="mainIcon" value="🍽️">
         <input class="title-input" id="mainTitle" value="STANDING BUFFET (FINGER FOOD / BOUCHEES)">
@@ -287,72 +445,102 @@
 
     <div id="sectionsContainer"></div>
 
-    <button class="add-section-btn" onclick="addSection()">＋ Add Section</button>
+    <button class="add-section-btn" onclick="addSection()">＋ Add Section / Category</button>
 
     <div class="form-section">
-      <h3>Delivery Details</h3>
-      <div class="row2">
-        <input class="icon-input" id="deliveryIcon" value="🚚">
-        <label class="small-label" style="margin:0;">icon</label>
+      <h3>💰 Financials (Pricing)</h3>
+      <div class="pricing-row">
+        <input placeholder="Label" value="Subtotal" id="p1label">
+        <input class="amount" placeholder="Amount" value="175.00" id="p1amount">
       </div>
-      <label class="small-label">Delivery time</label>
-      <input class="delivery-field" id="deliveryTime" value="Delivery will be made by 10:30 AM to:">
-      <label class="small-label">Location line 1</label>
-      <input class="delivery-field" id="deliveryLine1" value='Starco Building – Bloc "A" – 5th Floor'>
-      <label class="small-label">Location line 2</label>
-      <input class="delivery-field" id="deliveryLine2" value="Office of the Minister of State for Administrative Reform (OMSAR)">
+      <div class="pricing-row">
+        <input placeholder="Label" value="VAT (11%)" id="p2label">
+        <input class="amount" placeholder="Amount" value="19.25" id="p2amount">
+      </div>
+      <div class="pricing-row">
+        <input placeholder="Label" value="GRAND TOTAL (USD)" id="p3label">
+        <input class="amount" placeholder="Amount" value="194.25" id="p3amount">
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>📜 Terms & Conditions</h3>
+      <label class="small-label">Add payment terms, bank details, or validity.</label>
+      <textarea class="terms" id="termsText">1. Quotation valid for 15 days from the date of issue.
+2. A 50% advance payment is required to confirm the booking.
+3. Final headcount must be confirmed 48 hours prior to the event.</textarea>
     </div>
 
     <div class="form-section">
-      <h3>Pricing</h3>
-      <div class="pricing-row">
-        <input placeholder="Label" value="Total" id="p1label">
-        <input class="amount" placeholder="Amount" value="175 USD" id="p1amount">
-      </div>
-      <div class="pricing-row">
-        <input placeholder="Label" value="VAT" id="p2label">
-        <input class="amount" placeholder="Amount" value="19 USD" id="p2amount">
-      </div>
-      <div class="pricing-row">
-        <input placeholder="Label" value="GRAND TOTAL (INCLUDING VAT)" id="p3label">
-        <input class="amount" placeholder="Amount" value="194 USD" id="p3amount">
-      </div>
-    </div>
-
-    <div class="form-section">
-      <label class="small-label">Footer symbol (leave blank to remove)</label>
-      <input class="delivery-field" id="footerText" value="• 🌿 •">
+      <label class="small-label">Footer symbol / Text (leave blank to remove)</label>
+      <input class="input-field" id="footerText" value="• Thank you for your business •">
     </div>
 
   </div>
 
-  <!-- PRINT VERSION (built from the form fields right before printing) -->
+  <!-- PRINT VERSION -->
   <div id="printSheet">
     <div class="sheet-inner">
-      <div class="logo">
-        <img src="data:image/jpeg;base64,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" alt="Shoppy logo">
-      </div>
-      <h1 class="p-title" id="out-quoteTitle"></h1>
-      <div class="p-section-header" id="out-mainHeader"></div>
-      <div id="out-sections"></div>
-      <div class="p-block">
-        <div class="p-icon" id="out-deliveryIcon"></div>
-        <div class="p-block-content">
-          <h3>DELIVERY DETAILS:</h3>
-          <div class="items" id="out-delivery"></div>
+      
+      <!-- HEADER -->
+      <div class="p-header-layout">
+        <div class="p-logo">
+          <!-- Logo image -->
+          <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wgARCAB6AO0DASIAAhEBAxEB/8QAGgABAAMBAQEAAAAAAAAAAAAAAAMEBQIGAf/EABYBAQEBAAAAAAAAAAAAAAAAAAABAv/aAAwDAQACEAMQAAAC3wAEUh9AAglyTYc9AAAAAAAAAAGDq5OsWQPn3kox3JCnoVbQAAAAAAAA5h8+el789tGRq5UB6CXCpHqjPiznwMtzrE16kYlbT0H3EgPSsfSJufKXDclwK56dTyj0IDA1jnD9PWO5vNapR0s3WLHm/SecN3I2KGVZujCuXqJTuVNPSyDy3osDeMH02BvjI1845ytGyW/uL2U/S07hk3+8YtxcbJhasdkk856OgW/OelFO1kxEWt1cMKtZulutnyFTeliPJ+oybJp+btax3MHl5p7xdAAAAAr2EVvloVpuxhafyxXb5FE0cisvUhkjojJOfnBgeljkoAAAAAAABx3ViTuGMsIOYs8fOCTulIT/ACG5XQoAAAAAAAADnoirNIIfk4hl+gKAA//aAAwDAQACAAMAAAAh88488s88888888888c84Mc88888888sQAEw/aEUgYAM8cwcA8mdmwskc4YI8wMU4Y8040EIYsgc8888ueOwy8S6ic88888888qQeGC8888888888sOo2u888/9oADAMBAAIAAwAAABAAAAAAggAAAAAABQADgBSSAAAAAAABQyygwayPDRwBxQCDiwgTuDmRAiATyQBAhADzjjixgQzDTQAAAAJJKg4CYY4hAAAAAAABDXPdXABQAAAAAABBKYgAABT/xAAkEQACAgIABAcAAAAAAAAAAAABEQACAxIQEyEwFCBAUFFhcf/aAAgBAgEBPwD2K9xUMzn2mPJt07uTHvPD/crh1LfrCHNYuDHBhqEqbDtWKDm1f2O3xCS4LW6yrPbUAUUA8n//xAAaEQACAgMAAAAAAAAAAAAAAAABEQBQEjBA/9oACAEDAQE/AKNQjaCplCXXrm//xABCEAABAwICBAoGBwcFAAAAAAABAgMEABEFEgYTITEQFCIyM0FRUmFxQHJzgbHBICM1QmKCkRUkMDRDkqFQY9Hh8P/aAAgBAQABPwL+GmR++rjneEBY9Heksx7a5xKL7rmkqC0hSTdJ2g/RSsLF0m+21Q18Zx6S6OY2jV/+/wA1nGcovygL29G0l3RvzfKoH2fH9mn4fQJsLmsJWXY7rx3OPKUnyrAmtXDcJ55cN6acLuNPZea00EHzvf0bSXdG/N8qw/7Pj+zT8PoOJ1jakd4WqE0WYTTZFilNjTaEozZRbMq586iRyw7JJ/qO5gfd6GtxDYutSUjxNqQ8270biVeqb8Gku6N+b5VA+z4/s0/CuNR82XXt37M4q9+FcplvYVbfCsPDEJTp1ritYfvCkLSsXSb/AEFvst891CfWVakOocF0LSryN/oKWlAupQA8aTJYWbIebUewKH8CbI4pEce35Rs86hwHcXUqRIeOW9vGpGBOx/rYbqlKHVuNQy8YjfGBZ23KrSXdG/N8qa43irbcdk6uO2gJUe2jo2jJskKzerUaRIwidqHT9XflDqt2jgmSTctoOzr4W3FNrzJNjTLoebzD31pISGGRfYVGuPSpbTMOGTcIGddI0cuLuyOV+FNP4JJifWxXSu3ZsVWEYqZJ1D/S9Su9UslMN8g2IbV8Kw/EFQo74TynFkZB+u2m8GlTDrZj5ST1bz/1TmjfJ+qkbfxJqNPlYXJ1ErMW+sHbbxFT2OO4etCDe4zIrR6VlWuKrr5Sfnw6QSrluIjfzlfKoEbikJtrrA2+dYlHMqA60nnHdWFYmIAVHkIUE5t/YaYlMSRdl1K/Lg0l5sf83yrCmg1hrAHWnMffwaSJHGWVdqKSq0QL68l6sasasaseysPJDik9orSTomPWNYNGDEBCrcpzlE/DhxNHEcYS63sBs5Uz+Rf9mr4Vo/GS7JW8oX1e7z4cfjhcLXfebP8AisCdLuGpB+4ctYo0rD8UTJb3KOcefXTTiXmUOI5qhcU4tLTalqNkpFzWFtnEMVXLcGxJze/q4ZMCNL6VoE97canYQuCnjMZ1VkfqKwiaqbEzL6RJyq8a0l5sb83yqB9nx/Zp+HBpJ0zHqmmtkVFhc5BWHYuJz6mi1qyBfnX4XnA0ytxW5IvWG4mcQUv6nIEdea9aSdCx6xrD1hzD46h3AOHSA58QbQneEWqULYe+P9pXwrRtY/eG+vYeHHFhOFuDvEAfrWjySMPUe84bVi0TjcFQA5aeUmtHpWZpUZR2o5SfKtIJWSOmOnnOb/KsMicThIQeeeUrz4MVxCRBkNZUDVHf41HlMym87SwfiKxiY0zCcazAuLGUJrR5lTcJTiv6itnlWkvNj/m+VQPs+P7NPw4NJenY9U0z0DfqisQju4ZiIlMjkE3H/FRMUjSkjlhC+4o0t5ttOZbiUjtJrFMU43+6xblJO097wrC4XEogSrpFbVVpL0THrGsNnqw7K1IB1LgzpPZTchl1OZtxKh4GpmKR4iDywtfUhJrC47mIYgZj3NSrN5nsqZ/Iv+zV8KguPRlmU0LhuwX5GouJRpSeQ4Aruq2GnZLLKczjqEjxNT5bmLykMR0nIDyfHxqMwI0ZtlO5I4JaThWMh5HRqOb3dYqIP2pjS5Kuib3fLhfYbktFt1OZJpzRwZrtSCB2KTeo+jzSF5nnC54WsKACQABYCsQw5OIBvM4UZL7qYa1LCGgb5E24MQwtE9aFKcUnKLbBSE5EBPYLUtCXEFC0hSTvBp/R5hZu04pvw3ik6N7eVJ2eCKiYbGh7W03X3lb+DSTomPWNR4rMvCY6HkZhqx7qc0bGb6uQQPxJvTGjrKDd5xTnhupCEtoCEJCUjcBUz+Rf9mr4Vo4AoSgRcHL86kaPsOG7Sy14bxSNGxflydngiokFiEmzSNp3qO88OkS2tQ02elvceArC4nFISUkctXKV5/xFJl5jlW1bquKyzO+1/aayzO+z/aayzO+1+hpoOBP1hBV4CtJeiY9Y1h32dH9mPoPt62O43e2ZJFYPh7sEPa0puu276Li0tNqWs2SkXNQkqxXF1SHByEcq3wHoU+A3PbSlainKbgimWwyyhpPNSLClKCU3JsKTKaUsJCtp8OF1/VKAyKVfspCs6Aq1r8DryGrZr7ewU2vWJvlUnzppYksnMkWOwg02y0yLNNpQD3Rb0Nx1LQuqgvWclbKgk9tBtCeagD3Up4ZFlshRTWuGrQs7lU87qk7rqO4U2t0O5Hcu0XFqEtBf1fuvTzhQBlF1q3CmHFKzhdsyTbZUTob95RPokklt5t3LmQNh8K48xa9z+lax6VsbTkb7xoxVN9ARtFlXri60lKVujUg7KfzpeQ4lvPst5UUPICHeesHaBRad1di30ir+rS2pZI2p5O5XXSUvarVJbyX5yiaQkIQEjcPRdWi98ib+XBqZClct6w/DTikDYoX67WvWtX91lXv2VeSfutjzNWkdrf6Gk5vvW93+i//EACoQAQABAgMIAgMBAQEAAAAAAAERACExQVEQYXGBkaGx8MHRIEDhMFDx/9oACAEBAAE/If8AMXGgdRUe/n9fkVKmj/BgYJ+KSAEuIw0uT4d8nyUFBYFuM/T+t3VHvtH4E6QBK0UiGTwfTUA/D7fdMuKDV/0/W7r8RwVmBZcagXMG/Ok8cCNWNAJiawR8z+nvZ0QopQzR8NndUOJ/YUhIPGKAJGTawyRkJobQF0cerfGofzu2TFTTsN6B5VBk6ltCNb27KCt/7GdihUztWMaGaGFlYaqx3ovkXolOhoXqDcc/FSkwsEPdK7qiRF67CC/HhXV1THSakbtEsyVDanRYWZnu2hIR3oxYcBo0I0SBraiGjU8Mxrkb8/N3M8cDq40ZML4MXCMam2QJwofdOWQCZMqnDArcHF4Vi7FIi+OCik8DaeZQCIMIsamlHMAkGy4nX5pE+hcnJ7o7WmCrB2e7qmHOca7WBCCdUZjtUmgGBfCROVQkGYrnExNnc0BThbxu2AzSDyf7T4kD2VduM1uGt01BmpyTEnT/ANr3mhUPkZx30+dsWpABrNzs9agv7SoiQJF1Z8odp8hHvvMR1ilYlflxPNE7G7Oh7rThSPmVOWBNxU1i2PQ5fG26aVeQpypcRtv5Ma1CoOhruKPfaNnvNak2AgNbVZYrzr8DbiYd8qJbYTil5Gle00Kcm3XBD3No3kSG9X+VugDuqLqT3lz3jtRyTxNB8DTpLI4ID4auHdfMuZXy2Cx7+aktdkGn7fFQKjqL6w5bJRpS0xTc3Wo0JzPIUqEcDcnN0oRIu8K0+a7mj32jZ6TWr/atWIm9FhcX39KjbPYDO7WlmgrCreDQJdZA0q0qS3rpyr1mhVqZA3uz4Vv0cLSQ6iCu/SgumYYtkjhbpXvtVSb8DWTHdbrFB3NzQffKuDwmkMLQ5s1oVl4KdXN67CkwENXp0pyEvJd2H52jFyTlvK5+8BzEoND7xlcaMsCACwUcYEQmZj6oIoAVzg2SI2sGagJkKh6BgEjSuX5z+1f1J807vo0/xy2e80KMRYXBUZNJlomV1EorFcpH7o8AwCAr22qjHACJIlX7p0+3WsVHRE+aWQtQczbGCVb8zrbpVvzrLLlh/pnLcTP4OMPcQ+iK9ZoV73T8ELkndJIp8mABzYn7/GcoCaFNSmuZHt0f0lXVAy4w5tCkxgxWpM+BdtO24ttX3QTDszUYCSaXkYYauVhvRTpESgy6fpyUxsBdWuTESOk12sqJM3cHOoZCwWymhCE+Dza7dXd1LIpeCwWhaWRUfi7OFo3HADr+orUFg7qQ6VVDMbHMKs4L951iW2GyulSJRYDNrShJRdkkQcKPfsSYrfUCuzgYU1ePqJxrDWI/Vj5ghsJC7WDUFK4A1SuO3spkOPX4ozB9taELk/8AFf/EACkQAQABAwMEAQQDAQEAAAAAAAERACExQVFhEHGBkaEgQMHwMLHR8eH/2gAIAQEAAT8Q/jBcCpoieQH/ABU/bEoeQysxMT3PdBRSjKiRHZPoWCi5IY0cHcRKl5diUF8qOKDg6hBAPZfR9ifS4izRcv8AQATFkYAy1p590aD59FLAQjS8xg9k9mplNt1geCHh+xPqh/WbPoc4hjQCT80P4WmSORvLLPNQkSGWQJRosC8q60AaLDaJ8Q/YnTQZPzwtZoGIB7NDPXGQL6EiQekzRESEiMidTQZTmPMWPdBRcSBGEwqkpsmC1Bt1XMd9uiMqhm9arakXpFNA3Iw8i9FgmsJ2pkF5P7mhCDhK8DU0JKwUC4xv1C/CgEmKc5uThALxInimks0xCi2IGiXgKJh5Eg8uB7QecU89YjMsLFhYKFpnpnMGLaGkovfjEIWFoCLZaYvZI90RbujXBJh1sXhG+AZZpMt60K1Dtv67jo0MUq/I2GyalZ/i5mDJ+e1LSqNsgQvaX3UX77UIDLuWHJWKHJ90yS1uT3QUxzTgxyPgI7DT9JcKwJRMRL2yDtdWhnQggnM0KgOzCyjXTGVjahJDhETokgcJjEFGToLRE7knpqINyZPjVcMN8NB2soz1dsPanFhK0QkQ8kMdRg1A+VW3LlYpI6ZXMkkBwKhwVDWtRiGMtJs80oQzTbCO8WYuM2Zs2JCbD8nyFGLVetMNoqouCa+w7B0BBDMakp/al97BYtKtalVRu1N/lR/5VJPwUEgz5aV/iq2tD7YrXQSOwjy7uiDRF1q2XDtKjRDmRQeKhWjEkHY8HkR0oAwdCwsDumXsXh3pcw+uyPUE8VhhTWhb/DMvEdKnyAnMCYed6FdsaBL/AFSbtWgK3jEnbvRimKxScEo7YljZk4pU1DkKYhAAm9i296lyKwILBh0kYeRx9EvD93spzQFLEgwTpSLWVcMCRabz4aC3RWo7GhfxQHbtLoYI2leekQMDKRgEXhDx1JqZhdlg7w+1Xpm8dioSEkFrcPTHUPoQOv5AeKd8chCd79FbPzC6DI7iRvG1TmMkjlrDshrIvFzklj0e1CGgl1iJPAKCl6fxlJQs3EEedYinvsmUk2zD+4oZlzErEtALnLalQmCdRh5PwrJet4fo9lcW/h1BMeJbdMDMOG11U/4IKPYmx5PIYouSJfYS0YOsLutyuhxKhFssQUvUgiAOoIO8uvRoqPFdhJYGdCFxGBvIdd2R3Bk7NHDhYuUFjy+BxV7GhgD1ILgBrRhdqa7UdbYLYtelDPCW1e0LZzIpocEyBexleCWkJQLNTww9EusDVye1GtByl804pfpgsKx4pY2Gi4CibQkg0lFm470EEUVfFY2FaIXE3KQmPHyBHqp5iyo8lTslHwoOAWADAFSpgofJT+ppPgmoQBL66I8QAgLOtCmAC6gRUdKhgcjQyhTBLtKDytBGdGkXsuPTU6LEWb1CweAnWaxijNKDFiaSbhcf71ml642IB5D0UPGQ3f3hV4SofUDA4ChlxRFO5chBEbJS78nCvAolDF1wBvK49NGWBDe2dnBBx1EF3kCInhQjV4UWvQy4B8EdwuvQ/iRkVCGNBhzQB+57q7+x7pTH73NBR6qqI0IV99Gn7jb9BAgtkiaXzTlrrwZawZ08fSM1hdAlpyg2QEx7SXfkosdD+dwE4CSSERsjb1QwXKJYIJd7US45RAFT99AAF7pFadJzCVlCNP3FHpCnCdDbuacUNtNdaYq5glBvE0gIBYYGIRIZIm1RCcKFiWBL1PsCLyUJwQGWojYTL13CTyU6KZhMT0Urp7KABYY7NR8Dz3DwnibVvroz/IoAU0WWCCpzmnKuaRAtHF7FXl0RgWLrwUAOY/ENp2mHtQ/1QzA/r6D7As4IZW/r1RObbBT/AJ80ytJzeKPx7oOPTMznCNbpH/aiKFyRSe06tGeMaiVy4i1W4S+W3oDzOaxaGKrGIhw50vVuRLARF5tMf9q/VlDymyI1fP5rCSzzGv0H2CCQlEADYm9xURTeKS0T0fM0wyaSlGGAY71cdmD+lX4rSNsn8CkM9uT8KB3kCHpWoPpPsno1F/4Sv//+AAMA/9k=" alt="Company Logo">
+        </div>
+        <div class="p-meta-info">
+          <h1 id="out-quoteTitle">QUOTATION</h1>
+          <table class="p-meta-table">
+            <tr><td class="label">Date:</td><td id="out-docDate"></td></tr>
+            <tr><td class="label">Ref No:</td><td id="out-docNumber"></td></tr>
+            <tr id="row-mof"><td class="label">MOF:</td><td id="out-mof"></td></tr>
+            <tr id="row-tva"><td class="label">TVA:</td><td id="out-tva"></td></tr>
+          </table>
         </div>
       </div>
-      <table class="p-pricing">
-        <thead><tr><td>PRICING:</td><td style="text-align:right">AMOUNT (USD)</td></tr></thead>
-        <tbody id="out-pricing"></tbody>
-      </table>
+
+      <!-- CLIENT & DELIVERY INFO -->
+      <div class="p-info-grid">
+        <div class="p-info-box">
+          <h3>Bill To</h3>
+          <p><strong id="out-clientName"></strong></p>
+          <p id="out-clientPhone"></p>
+          <p id="out-clientEmail"></p>
+          <p id="out-clientAddress"></p>
+        </div>
+        <div class="p-info-box">
+          <h3 id="out-deliveryTitle">Event Details</h3>
+          <p><strong>Timing:</strong> <span id="out-deliveryTime"></span></p>
+          <p><strong>Location:</strong> <span id="out-deliveryLine1"></span></p>
+          <p><span id="out-deliveryLine2"></span></p>
+        </div>
+      </div>
+
+      <!-- MAIN ITEMS TABLE / SECTIONS -->
+      <div class="p-section-header" id="out-mainHeader"></div>
+      <div id="out-sections"></div>
+
+      <!-- PRICING TOTALS -->
+      <div class="p-pricing-container">
+        <table class="p-pricing">
+          <tbody id="out-pricing"></tbody>
+        </table>
+      </div>
+
+      <!-- TERMS & CONDITIONS -->
+      <div class="p-terms" id="out-terms-container">
+        <h4>Terms & Conditions</h4>
+        <div id="out-terms"></div>
+      </div>
+
+      <!-- FOOTER -->
       <div class="p-footer" id="out-footer"></div>
+      
     </div>
   </div>
 
 <script>
 let sectionCount = 0;
-// التعديل هنا: استخدام الأرقام كقيمة افتراضية للأيقونات
 const defaultSections = [
   {icon:"1", title:"SAVORY SELECTION:", items:
 `Mini baguette (white): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
@@ -365,8 +553,7 @@ Mini donuts: 18 pcs`},
 `2 bottles of orange juice (processed)`}
 ];
 
-// التعديل هنا: جعل الرقم الافتراضي للقسم هو رقمه التسلسلي إذا لم يتم إدخال قيمة
-function addSection(icon, title="NEW SECTION:", items="Item name: quantity"){
+function addSection(icon, title="NEW CATEGORY:", items="Item description: quantity"){
   sectionCount++;
   const id = sectionCount;
   const secIcon = (icon !== undefined) ? icon : id;
@@ -392,18 +579,47 @@ function escapeHtml(str){
 }
 
 function buildPrintView(){
-  document.getElementById('out-quoteTitle').textContent =
-    document.getElementById('quoteTitle').value;
+  // Meta Info
+  document.getElementById('out-quoteTitle').textContent = document.getElementById('quoteTitle').value;
+  document.getElementById('out-docNumber').textContent = document.getElementById('docNumber').value;
+  document.getElementById('out-docDate').textContent = document.getElementById('docDate').value;
+  
+  const mof = document.getElementById('mofNumber').value.trim();
+  const tva = document.getElementById('tvaNumber').value.trim();
+  document.getElementById('out-mof').textContent = mof;
+  document.getElementById('out-tva').textContent = tva;
+  document.getElementById('row-mof').style.display = mof ? 'table-row' : 'none';
+  document.getElementById('row-tva').style.display = tva ? 'table-row' : 'none';
 
-  document.getElementById('out-mainHeader').textContent =
+  // Client Info
+  document.getElementById('out-clientName').textContent = document.getElementById('clientName').value;
+  document.getElementById('out-clientPhone').textContent = document.getElementById('clientPhone').value;
+  document.getElementById('out-clientEmail').textContent = document.getElementById('clientEmail').value;
+  document.getElementById('out-clientAddress').textContent = document.getElementById('clientAddress').value;
+
+  // Delivery Info
+  document.getElementById('out-deliveryTitle').textContent = document.getElementById('deliveryIcon').value + ' ' + document.getElementById('deliveryTitle').value;
+  document.getElementById('out-deliveryTime').textContent = document.getElementById('deliveryTime').value;
+  document.getElementById('out-deliveryLine1').textContent = document.getElementById('deliveryLine1').value;
+  document.getElementById('out-deliveryLine2').textContent = document.getElementById('deliveryLine2').value;
+
+  // Header Title
+  document.getElementById('out-mainHeader').textContent = 
     document.getElementById('mainIcon').value + ' ' + document.getElementById('mainTitle').value;
 
-  document.getElementById('out-deliveryIcon').textContent =
-    document.getElementById('deliveryIcon').value;
+  // Footer & Terms
+  document.getElementById('out-footer').textContent = document.getElementById('footerText').value;
+  
+  const terms = document.getElementById('termsText').value.trim();
+  const termsContainer = document.getElementById('out-terms-container');
+  if(terms) {
+    document.getElementById('out-terms').innerHTML = terms.split('\n').map(l => escapeHtml(l)).join('<br>');
+    termsContainer.style.display = 'block';
+  } else {
+    termsContainer.style.display = 'none';
+  }
 
-  document.getElementById('out-footer').textContent =
-    document.getElementById('footerText').value;
-
+  // Sections
   const container = document.getElementById('out-sections');
   container.innerHTML = '';
   for(let i=1; i<=sectionCount; i++){
@@ -414,7 +630,6 @@ function buildPrintView(){
     const items = document.getElementById('items-'+i).value;
     const lines = items.split('\n').filter(l => l.trim() !== '');
     
-    // التعديل هنا: إرجاع النقطة للسطور الداخلية كما كانت في الكود الأصلي
     const listHtml = lines.map(l => '• ' + escapeHtml(l)).join('<br>');
     
     const block = document.createElement('div');
@@ -428,16 +643,12 @@ function buildPrintView(){
     container.appendChild(block);
   }
 
-  document.getElementById('out-delivery').innerHTML =
-    escapeHtml(document.getElementById('deliveryTime').value) + '<br>' +
-    '<b>' + escapeHtml(document.getElementById('deliveryLine1').value) + '</b><br>' +
-    '<b>' + escapeHtml(document.getElementById('deliveryLine2').value) + '</b>';
-
+  // Pricing
   const pricingBody = document.getElementById('out-pricing');
   pricingBody.innerHTML = `
-    <tr><td>${escapeHtml(document.getElementById('p1label').value)}</td><td class="amt" style="text-align:right">${escapeHtml(document.getElementById('p1amount').value)}</td></tr>
-    <tr><td>${escapeHtml(document.getElementById('p2label').value)}</td><td class="amt" style="text-align:right">${escapeHtml(document.getElementById('p2amount').value)}</td></tr>
-    <tr class="grand"><td>${escapeHtml(document.getElementById('p3label').value)}</td><td class="amt" style="text-align:right">${escapeHtml(document.getElementById('p3amount').value)}</td></tr>
+    <tr><td>${escapeHtml(document.getElementById('p1label').value)}</td><td class="amt">${escapeHtml(document.getElementById('p1amount').value)}</td></tr>
+    <tr><td>${escapeHtml(document.getElementById('p2label').value)}</td><td class="amt">${escapeHtml(document.getElementById('p2amount').value)}</td></tr>
+    <tr class="grand"><td>${escapeHtml(document.getElementById('p3label').value)}</td><td class="amt">${escapeHtml(document.getElementById('p3amount').value)}</td></tr>
   `;
 }
 
@@ -468,7 +679,7 @@ function updateStyleVars(){
   const accent = document.getElementById('accentColor').value;
   root.setProperty('--olive', accent);
   root.setProperty('--olive-dark', darkenColor(accent, 18));
-  root.setProperty('--numbers-color', document.getElementById('numbersColor').value);
+  
   if(document.getElementById('printSheet').classList.contains('visible')){
     buildPrintView();
   }
