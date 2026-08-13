@@ -13,6 +13,7 @@
     --text:#2b2b26;
     --print-font-size:15px;
     --print-font-weight:400;
+    --numbers-color:#000000;
   }
   *{box-sizing:border-box;}
   body{
@@ -214,7 +215,9 @@
   table.p-pricing{width:100%;border-collapse:collapse;margin-top:18px;font-size:0.93em;}
   table.p-pricing thead td{background:var(--olive);color:#fff;font-weight:700;padding:9px 12px;}
   table.p-pricing tbody td{padding:9px 12px;border-bottom:1px solid var(--line);font-weight:var(--print-font-weight);}
+  table.p-pricing tbody td.amt{color:var(--numbers-color);font-weight:600;}
   table.p-pricing tr.grand td{background:#f1f0e6;font-weight:700 !important;}
+  table.p-pricing tr.grand td.amt{color:var(--numbers-color);font-weight:800 !important;}
   .p-footer{text-align:center;margin-top:16px;color:var(--olive);letter-spacing:3px;}
 
   @page{
@@ -261,6 +264,10 @@
         <div class="style-field">
           <label class="small-label">Accent color</label>
           <input type="color" id="accentColor" value="#7d7c4a" oninput="updateStyleVars()">
+        </div>
+        <div class="style-field">
+          <label class="small-label">Numbers color</label>
+          <input type="color" id="numbersColor" value="#000000" oninput="updateStyleVars()">
         </div>
       </div>
     </div>
@@ -345,27 +352,30 @@
 
 <script>
 let sectionCount = 0;
+// التعديل هنا: استخدام الأرقام كقيمة افتراضية للأيقونات
 const defaultSections = [
-  {icon:"🥗", title:"SAVORY SELECTION:", items:
+  {icon:"1", title:"SAVORY SELECTION:", items:
 `Mini baguette (white): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
 Mini baguette (brown): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
 Savory pastries (Spinach Fatayer): 50 pcs`},
-  {icon:"🧁", title:"SWEET SELECTION:", items:
+  {icon:"2", title:"SWEET SELECTION:", items:
 `Mini chocolate croissants: 18 pcs
 Mini donuts: 18 pcs`},
-  {icon:"🥤", title:"BEVERAGES:", items:
+  {icon:"3", title:"BEVERAGES:", items:
 `2 bottles of orange juice (processed)`}
 ];
 
-function addSection(icon="🍴", title="NEW SECTION:", items="Item name: quantity"){
+// التعديل هنا: جعل الرقم الافتراضي للقسم هو رقمه التسلسلي إذا لم يتم إدخال قيمة
+function addSection(icon, title="NEW SECTION:", items="Item name: quantity"){
   sectionCount++;
   const id = sectionCount;
+  const secIcon = (icon !== undefined) ? icon : id;
   const div = document.createElement('div');
   div.className = 'form-section';
   div.id = 'section-' + id;
   div.innerHTML = `
     <div class="row2">
-      <input class="icon-input" id="icon-${id}" value="${icon}">
+      <input class="icon-input" id="icon-${id}" value="${secIcon}">
       <input class="title-input" id="title-${id}" value="${title}">
       <button class="remove-btn" onclick="document.getElementById('section-${id}').remove()">✕ remove</button>
     </div>
@@ -403,7 +413,10 @@ function buildPrintView(){
     const title = document.getElementById('title-'+i).value;
     const items = document.getElementById('items-'+i).value;
     const lines = items.split('\n').filter(l => l.trim() !== '');
+    
+    // التعديل هنا: إرجاع النقطة للسطور الداخلية كما كانت في الكود الأصلي
     const listHtml = lines.map(l => '• ' + escapeHtml(l)).join('<br>');
+    
     const block = document.createElement('div');
     block.className = 'p-block';
     block.innerHTML = `
@@ -422,9 +435,9 @@ function buildPrintView(){
 
   const pricingBody = document.getElementById('out-pricing');
   pricingBody.innerHTML = `
-    <tr><td>${escapeHtml(document.getElementById('p1label').value)}</td><td style="text-align:right">${escapeHtml(document.getElementById('p1amount').value)}</td></tr>
-    <tr><td>${escapeHtml(document.getElementById('p2label').value)}</td><td style="text-align:right">${escapeHtml(document.getElementById('p2amount').value)}</td></tr>
-    <tr class="grand"><td>${escapeHtml(document.getElementById('p3label').value)}</td><td style="text-align:right">${escapeHtml(document.getElementById('p3amount').value)}</td></tr>
+    <tr><td>${escapeHtml(document.getElementById('p1label').value)}</td><td class="amt" style="text-align:right">${escapeHtml(document.getElementById('p1amount').value)}</td></tr>
+    <tr><td>${escapeHtml(document.getElementById('p2label').value)}</td><td class="amt" style="text-align:right">${escapeHtml(document.getElementById('p2amount').value)}</td></tr>
+    <tr class="grand"><td>${escapeHtml(document.getElementById('p3label').value)}</td><td class="amt" style="text-align:right">${escapeHtml(document.getElementById('p3amount').value)}</td></tr>
   `;
 }
 
@@ -455,6 +468,7 @@ function updateStyleVars(){
   const accent = document.getElementById('accentColor').value;
   root.setProperty('--olive', accent);
   root.setProperty('--olive-dark', darkenColor(accent, 18));
+  root.setProperty('--numbers-color', document.getElementById('numbersColor').value);
   if(document.getElementById('printSheet').classList.contains('visible')){
     buildPrintView();
   }
