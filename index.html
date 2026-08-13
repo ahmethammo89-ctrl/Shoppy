@@ -11,6 +11,8 @@
     --cream:#fdfcf9;
     --line:#c9c8a0;
     --text:#2b2b26;
+    --print-font-size:15px;
+    --print-font-weight:400;
   }
   *{box-sizing:border-box;}
   body{
@@ -146,6 +148,34 @@
     display:block;
     margin-bottom:2px;
   }
+  .style-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+  .style-field{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-width:110px;
+  }
+  .style-field select{
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 6px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fff;
+  }
+  .style-field input[type="color"]{
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:2px;
+    height:38px;
+    width:100%;
+    cursor:pointer;
+  }
 
   /* ---------- PRINT SHEET ---------- */
   #printSheet{
@@ -161,35 +191,39 @@
   .sheet-inner{
     border:1px solid var(--olive);
     padding:30px 25px 20px 25px;
+    font-size:var(--print-font-size);
   }
   .logo{text-align:center;margin-bottom:6px;}
   .logo img{max-width:220px;height:auto;}
   h1.p-title{
-    text-align:center;font-size:22px;letter-spacing:1px;color:var(--olive-dark);
-    margin:16px 0;display:flex;align-items:center;gap:12px;
+    text-align:center;font-size:1.55em;letter-spacing:1px;color:var(--olive-dark);
+    margin:16px 0;display:flex;align-items:center;gap:12px;font-weight:700;
   }
   h1.p-title::before, h1.p-title::after{content:"";flex:1;height:1px;background:var(--olive);}
   .p-section-header{
     background:var(--olive);color:#fff;padding:10px 16px;border-radius:6px;
-    font-weight:700;letter-spacing:.5px;margin:16px 0 12px 0;font-size:14px;
+    font-weight:700;letter-spacing:.5px;margin:16px 0 12px 0;font-size:1em;
   }
   .p-block{display:flex;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);}
   .p-icon{
     width:36px;height:36px;border-radius:50%;background:var(--olive);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:1.15em;flex-shrink:0;
   }
-  .p-block-content h3{margin:0 0 6px 0;color:var(--olive-dark);font-size:14.5px;}
-  .p-block-content div.items{font-size:13.5px;line-height:1.6;}
-  table.p-pricing{width:100%;border-collapse:collapse;margin-top:18px;font-size:13.5px;}
+  .p-block-content h3{margin:0 0 6px 0;color:var(--olive-dark);font-size:1.03em;font-weight:700;}
+  .p-block-content div.items{font-size:0.95em;line-height:1.6;font-weight:var(--print-font-weight);}
+  table.p-pricing{width:100%;border-collapse:collapse;margin-top:18px;font-size:0.93em;}
   table.p-pricing thead td{background:var(--olive);color:#fff;font-weight:700;padding:9px 12px;}
-  table.p-pricing tbody td{padding:9px 12px;border-bottom:1px solid var(--line);}
-  table.p-pricing tr.grand td{background:#f1f0e6;font-weight:800;}
+  table.p-pricing tbody td{padding:9px 12px;border-bottom:1px solid var(--line);font-weight:var(--print-font-weight);}
+  table.p-pricing tr.grand td{background:#f1f0e6;font-weight:700 !important;}
   .p-footer{text-align:center;margin-top:16px;color:var(--olive);letter-spacing:3px;}
 
+  @page{
+    margin:10mm;
+  }
   @media print{
-    body{background:#fff;padding:0;}
+    html, body{background:#fff;padding:0;margin:0;}
     .toolbar,.hint,.form-wrap{display:none !important;}
-    #printSheet{display:block !important;max-width:100%;margin:0;border:none;}
+    #printSheet{display:block !important;max-width:100%;margin:0;border:none;padding:0;}
     .sheet-inner{border:1px solid var(--olive);}
   }
 </style>
@@ -200,9 +234,36 @@
     <button onclick="showPreview()">👁️ Preview Quotation</button>
     <button onclick="window.print()">🖨️ Save as PDF</button>
   </div>
-  <div class="hint">عبّي الحقول تحت، دوس "Preview" لتشوف الشكل النهائي تحت. إذا زر "Save as PDF" ما فتح شي (بيصير أحياناً بمتصفح الموبايل داخل التطبيق)، افتح الملف من Safari أو Chrome مباشرة، وبعدين استخدم خيار "Share" أو "Print" من قائمة المتصفح نفسه واختار Save as PDF.</div>
+  <div class="hint">عبّي الحقول تحت، دوس "Preview" لتشوف الشكل النهائي تحت. لما تدوس "Save as PDF" رح يفتحلك المتصفح خيار الطباعة، ومن جوا هاد الخيار: اختار "Save as PDF" (بيصير PDF) أو اختار طابعة (بيطبع ورق). ⚠️ إذا طلعلك اسم الموقع أو التاريخ فوق/تحت الورقة: دوس "More settings" بنافذة الطباعة وفضّي/بطّل خيار "Headers and footers" — هيك بتطلع الفاتورة لحالها بس.</div>
 
   <div class="form-wrap" id="formWrap">
+
+    <div class="form-section">
+      <h3>Style</h3>
+      <div class="style-row">
+        <div class="style-field">
+          <label class="small-label">Font size</label>
+          <select id="fontSizeSelect" onchange="updateStyleVars()">
+            <option value="13">Small</option>
+            <option value="15" selected>Medium</option>
+            <option value="17">Large</option>
+            <option value="19">Extra Large</option>
+          </select>
+        </div>
+        <div class="style-field">
+          <label class="small-label">Font weight</label>
+          <select id="fontWeightSelect" onchange="updateStyleVars()">
+            <option value="400" selected>Normal</option>
+            <option value="600">Semi-Bold</option>
+            <option value="700">Bold</option>
+          </select>
+        </div>
+        <div class="style-field">
+          <label class="small-label">Accent color</label>
+          <input type="color" id="accentColor" value="#7d7c4a" oninput="updateStyleVars()">
+        </div>
+      </div>
+    </div>
 
     <div class="form-section">
       <label class="small-label">Quotation title</label>
@@ -374,6 +435,29 @@ function showPreview(){
   const sheet = document.getElementById('printSheet');
   sheet.classList.add('visible');
   sheet.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function darkenColor(hex, percent){
+  hex = hex.replace('#','');
+  let r = parseInt(hex.substring(0,2),16);
+  let g = parseInt(hex.substring(2,4),16);
+  let b = parseInt(hex.substring(4,6),16);
+  r = Math.max(0, Math.round(r * (1 - percent/100)));
+  g = Math.max(0, Math.round(g * (1 - percent/100)));
+  b = Math.max(0, Math.round(b * (1 - percent/100)));
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+
+function updateStyleVars(){
+  const root = document.documentElement.style;
+  root.setProperty('--print-font-size', document.getElementById('fontSizeSelect').value + 'px');
+  root.setProperty('--print-font-weight', document.getElementById('fontWeightSelect').value);
+  const accent = document.getElementById('accentColor').value;
+  root.setProperty('--olive', accent);
+  root.setProperty('--olive-dark', darkenColor(accent, 18));
+  if(document.getElementById('printSheet').classList.contains('visible')){
+    buildPrintView();
+  }
 }
 </script>
 
