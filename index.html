@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Professional Invoice & Quotation</title>
+<title>Pro Invoicing System</title>
 <style>
   :root{
     --olive:#7d7c4a;
@@ -36,12 +36,17 @@
     border:none;
     padding:12px 18px;
     border-radius:8px;
-    font-size:15px;
+    font-size:14px;
     cursor:pointer;
     font-weight:600;
     transition: background 0.3s;
   }
   .toolbar button:hover{background:var(--olive-dark);}
+  .toolbar button.btn-danger { background: #d9534f; }
+  .toolbar button.btn-danger:hover { background: #c9302c; }
+  .toolbar button.btn-primary { background: #337ab7; }
+  .toolbar button.btn-primary:hover { background: #286090; }
+
   .hint{
     max-width:700px;
     margin:0 auto 16px auto;
@@ -49,6 +54,46 @@
     font-size:13px;
     color:#666;
   }
+
+  /* ---------- DASHBOARD ---------- */
+  #dashboard {
+    max-width:700px;
+    margin:0 auto;
+    display:none;
+  }
+  .dash-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+  }
+  .dash-header h2 { color: var(--olive-dark); margin:0;}
+  .doc-card {
+    background: #fff;
+    border: 1px solid var(--olive);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .doc-info h4 { margin:0 0 5px 0; color: var(--text); }
+  .doc-info p { margin:0; font-size:12px; color: #666; }
+  .doc-actions button {
+    padding: 8px 12px;
+    margin-left: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .btn-edit { background: var(--olive); }
+  .btn-delete { background: #d9534f; }
+  .empty-state { text-align: center; padding: 40px; color: #888; background: #fff; border-radius: 8px; border: 1px dashed var(--olive); }
 
   /* ---------- EDIT FORM ---------- */
   .form-wrap{
@@ -155,39 +200,12 @@
     margin-bottom:3px;
     font-weight:600;
   }
-  .style-row{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:flex-end;
-  }
-  .style-field{
-    display:flex;
-    flex-direction:column;
-    flex:1;
-    min-width:110px;
-  }
-  .style-field select{
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:8px 6px;
-    font-size:14px;
-    font-family:inherit;
-    background:#fff;
-  }
-  .style-field input[type="color"]{
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:2px;
-    height:38px;
-    width:100%;
-    cursor:pointer;
-  }
+  .note-label { font-size: 11px; color: #d9534f; font-weight: normal; margin-left: 5px; }
 
   /* ---------- PRINT SHEET ---------- */
   #printSheet{
     display:none;
-    max-width:750px; /* جعلت العرض أكبر قليلاً ليناسب الفواتير الرسمية */
+    max-width:750px;
     margin:20px auto 0 auto;
     background:#fff;
     border:1px solid var(--olive);
@@ -263,7 +281,7 @@
     gap:10px;
     padding:12px 4px;
     border-bottom:1px solid var(--line);
-    page-break-inside: avoid; /* يمنع انقسام القسم بين صفحتين عند الطباعة */
+    page-break-inside: avoid;
   }
   .p-icon{
     width:24px;
@@ -321,7 +339,7 @@
   }
   @media print{
     html, body{background:#fff;padding:0;margin:0;}
-    .toolbar,.hint,.form-wrap{display:none !important;}
+    .toolbar,.hint,.form-wrap, #dashboard {display:none !important;}
     #printSheet{display:block !important;max-width:100%;margin:0;border:none;padding:0;}
     .sheet-inner{border:none; padding:0;}
   }
@@ -329,75 +347,67 @@
 </head>
 <body>
 
-  <div class="toolbar">
-    <button onclick="showPreview()">👁️ Preview Document</button>
-    <button onclick="window.print()">🖨️ Save as PDF / Print</button>
+  <!-- شريط الأدوات الرئيسي -->
+  <div class="toolbar" id="mainToolbar">
+    <button class="btn-primary" onclick="showDashboard()">🏠 Home (Dashboard)</button>
+    <button class="btn-primary" onclick="createNewDoc()">📄 New Document</button>
+    <button id="saveBtn" onclick="saveDocument()">💾 Save Document</button>
+    <button id="previewBtn" onclick="showPreview()">👁️ Preview / Print</button>
   </div>
-  <div class="hint">املأ الحقول أدناه لتجهيز فاتورتك أو عرض السعر. اضغط "Preview" للمعاينة. عند الطباعة (Save as PDF)، تأكد من إيقاف خيار "Headers and footers" من إعدادات المتصفح لضمان نظافة الورقة.</div>
 
-  <div class="form-wrap" id="formWrap">
+  <div class="hint" id="mainHint">
+    أهلاً بك! لإنشاء فاتورة، املأ الحقول واضغط "Save Document". <br>
+    💡 <b>ملاحظة سريعة:</b> لإخفاء أي حقل من الطباعة (مثل التاريخ، رقم الهاتف، أسطر التسعير) فقط امسح الكلام الموجود في المربع الخاص به!
+  </div>
 
-    <div class="form-section">
-      <h3>🎨 Visual Style</h3>
-      <div class="style-row">
-        <div class="style-field">
-          <label class="small-label">Font size</label>
-          <select id="fontSizeSelect" onchange="updateStyleVars()">
-            <option value="13">Small</option>
-            <option value="14" selected>Medium</option>
-            <option value="16">Large</option>
-          </select>
-        </div>
-        <div class="style-field">
-          <label class="small-label">Font weight</label>
-          <select id="fontWeightSelect" onchange="updateStyleVars()">
-            <option value="400" selected>Normal</option>
-            <option value="500">Medium</option>
-            <option value="600">Semi-Bold</option>
-          </select>
-        </div>
-        <div class="style-field">
-          <label class="small-label">Theme Color</label>
-          <input type="color" id="accentColor" value="#7d7c4a" oninput="updateStyleVars()">
-        </div>
-      </div>
+  <!-- لوحة التحكم (عرض الفواتير المحفوظة) -->
+  <div id="dashboard">
+    <div class="dash-header">
+      <h2>📂 My Saved Documents</h2>
     </div>
+    <div id="docsList"></div>
+  </div>
+
+  <!-- فورم التعديل والإدخال -->
+  <div class="form-wrap" id="formWrap">
+    
+    <!-- حقل مخفي لمعرف الوثيقة الحالية -->
+    <input type="hidden" id="currentDocId" value="">
 
     <div class="form-section">
       <h3>📄 Document Details</h3>
       <div class="grid-2col">
         <div>
-          <label class="small-label">Document Type</label>
+          <label class="small-label">Document Type <span class="note-label">(افتح القائمة لتغيير العنوان)</span></label>
           <select class="input-field" id="docType" onchange="document.getElementById('quoteTitle').value = this.value">
             <option value="INVOICE">Invoice (فاتورة)</option>
             <option value="QUOTATION" selected>Quotation (عرض سعر)</option>
-            <option value="PROFORMA INVOICE">Proforma Invoice</option>
           </select>
         </div>
         <div>
-          <label class="small-label">Title override (Optional)</label>
+          <label class="small-label">Title <span class="note-label">(امسح الكلام لإخفائه)</span></label>
           <input class="input-field" id="quoteTitle" value="QUOTATION">
         </div>
       </div>
       
       <div class="grid-2col">
         <div>
-          <label class="small-label">Document Number</label>
-          <input class="input-field" id="docNumber" value="QT-2026-0801">
+          <label class="small-label">Document Number <span class="note-label">(امسح الكلام لإخفائه)</span></label>
+          <input class="input-field" id="docNumber" value="QT-2026-001">
         </div>
         <div>
-          <label class="small-label">Date</label>
+          <label class="small-label">Date <span class="note-label">(امسح الكلام لإخفائه)</span></label>
           <input class="input-field" id="docDate" value="13 August 2026">
         </div>
       </div>
       
       <div class="grid-2col">
         <div>
-          <label class="small-label">Company MOF #</label>
+          <label class="small-label">Company MOF # <span class="note-label">(امسح الكلام لإخفائه)</span></label>
           <input class="input-field" id="mofNumber" value="3847291">
         </div>
         <div>
-          <label class="small-label">Company TVA #</label>
+          <label class="small-label">Company TVA # <span class="note-label">(امسح الكلام لإخفائه)</span></label>
           <input class="input-field" id="tvaNumber" value="8839-T">
         </div>
       </div>
@@ -405,27 +415,27 @@
 
     <div class="form-section">
       <h3>👤 Client Details (Bill To)</h3>
-      <label class="small-label">Client Name / Company</label>
-      <input class="input-field" id="clientName" value="Ministry of State for Administrative Reform">
+      <label class="small-label">Client Name / Company <span class="note-label">(امسح الكلام لإخفائه)</span></label>
+      <input class="input-field" id="clientName" value="Client Name Here">
       <div class="grid-2col">
         <div>
-          <label class="small-label">Phone</label>
+          <label class="small-label">Phone <span class="note-label">(امسح الكلام لإخفائه)</span></label>
           <input class="input-field" id="clientPhone" value="+961 1 XXXXXX">
         </div>
         <div>
-          <label class="small-label">Email / Contact Person</label>
+          <label class="small-label">Email / Contact Person <span class="note-label">(امسح الكلام لإخفائه)</span></label>
           <input class="input-field" id="clientEmail" value="Attn: Mr. Ahmad">
         </div>
       </div>
-      <label class="small-label">Address</label>
+      <label class="small-label">Address <span class="note-label">(امسح الكلام لإخفائه)</span></label>
       <input class="input-field" id="clientAddress" value="Beirut, Lebanon">
     </div>
 
     <div class="form-section">
-      <h3>🚚 Event / Delivery Details</h3>
+      <h3>🚚 Event / Delivery Details <span class="note-label">(امسح عنوان هذا القسم لإخفائه بالكامل)</span></h3>
       <div class="row2">
         <input class="icon-input" id="deliveryIcon" value="📌">
-        <input class="title-input" id="deliveryTitle" value="Event Logistics">
+        <input class="title-input" id="deliveryTitle" value="Event Details">
       </div>
       <label class="small-label">Timing / Date</label>
       <input class="input-field" id="deliveryTime" value="Thursday, 20 August 2026 at 10:30 AM">
@@ -439,7 +449,7 @@
       <h3>🛒 Products / Services</h3>
       <div class="row2">
         <input class="icon-input" id="mainIcon" value="🍽️">
-        <input class="title-input" id="mainTitle" value="STANDING BUFFET (FINGER FOOD / BOUCHEES)">
+        <input class="title-input" id="mainTitle" value="STANDING BUFFET (FINGER FOOD)">
       </div>
     </div>
 
@@ -448,7 +458,7 @@
     <button class="add-section-btn" onclick="addSection()">＋ Add Section / Category</button>
 
     <div class="form-section">
-      <h3>💰 Financials (Pricing)</h3>
+      <h3>💰 Financials (Pricing) <span class="note-label">(امسح حقل القيمة لإخفاء السطر)</span></h3>
       <div class="pricing-row">
         <input placeholder="Label" value="Subtotal" id="p1label">
         <input class="amount" placeholder="Amount" value="175.00" id="p1amount">
@@ -464,15 +474,13 @@
     </div>
     
     <div class="form-section">
-      <h3>📜 Terms & Conditions</h3>
-      <label class="small-label">Add payment terms, bank details, or validity.</label>
-      <textarea class="terms" id="termsText">1. Quotation valid for 15 days from the date of issue.
-2. A 50% advance payment is required to confirm the booking.
-3. Final headcount must be confirmed 48 hours prior to the event.</textarea>
+      <h3>📜 Terms & Conditions <span class="note-label">(امسح الكلام لإخفائه)</span></h3>
+      <textarea class="terms" id="termsText">1. Quotation valid for 15 days.
+2. A 50% advance payment is required to confirm.</textarea>
     </div>
 
     <div class="form-section">
-      <label class="small-label">Footer symbol / Text (leave blank to remove)</label>
+      <label class="small-label">Footer Text <span class="note-label">(امسح الكلام لإخفائه)</span></label>
       <input class="input-field" id="footerText" value="• Thank you for your business •">
     </div>
 
@@ -485,14 +493,13 @@
       <!-- HEADER -->
       <div class="p-header-layout">
         <div class="p-logo">
-          <!-- Logo image -->
           <img src="data:image/jpeg;base64,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" alt="Company Logo">
         </div>
         <div class="p-meta-info">
-          <h1 id="out-quoteTitle">QUOTATION</h1>
+          <h1 id="out-quoteTitle"></h1>
           <table class="p-meta-table">
-            <tr><td class="label">Date:</td><td id="out-docDate"></td></tr>
-            <tr><td class="label">Ref No:</td><td id="out-docNumber"></td></tr>
+            <tr id="row-docDate"><td class="label">Date:</td><td id="out-docDate"></td></tr>
+            <tr id="row-docNumber"><td class="label">Ref No:</td><td id="out-docNumber"></td></tr>
             <tr id="row-mof"><td class="label">MOF:</td><td id="out-mof"></td></tr>
             <tr id="row-tva"><td class="label">TVA:</td><td id="out-tva"></td></tr>
           </table>
@@ -501,18 +508,18 @@
 
       <!-- CLIENT & DELIVERY INFO -->
       <div class="p-info-grid">
-        <div class="p-info-box">
+        <div class="p-info-box" id="clientBox">
           <h3>Bill To</h3>
-          <p><strong id="out-clientName"></strong></p>
-          <p id="out-clientPhone"></p>
-          <p id="out-clientEmail"></p>
-          <p id="out-clientAddress"></p>
+          <p id="row-clientName"><strong id="out-clientName"></strong></p>
+          <p id="row-clientPhone"><span id="out-clientPhone"></span></p>
+          <p id="row-clientEmail"><span id="out-clientEmail"></span></p>
+          <p id="row-clientAddress"><span id="out-clientAddress"></span></p>
         </div>
-        <div class="p-info-box">
-          <h3 id="out-deliveryTitle">Event Details</h3>
-          <p><strong>Timing:</strong> <span id="out-deliveryTime"></span></p>
-          <p><strong>Location:</strong> <span id="out-deliveryLine1"></span></p>
-          <p><span id="out-deliveryLine2"></span></p>
+        <div class="p-info-box" id="deliveryBox">
+          <h3 id="out-deliveryTitle"></h3>
+          <p id="row-deliveryTime"><strong>Timing:</strong> <span id="out-deliveryTime"></span></p>
+          <p id="row-deliveryLine1"><strong>Location:</strong> <span id="out-deliveryLine1"></span></p>
+          <p id="row-deliveryLine2"><span id="out-deliveryLine2"></span></p>
         </div>
       </div>
 
@@ -541,19 +548,25 @@
 
 <script>
 let sectionCount = 0;
-const defaultSections = [
-  {icon:"1", title:"SAVORY SELECTION:", items:
-`Mini baguette (white): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
-Mini baguette (brown): 15 Halloumi & Cherry Tomato, 15 Turkey & Cheese
-Savory pastries (Spinach Fatayer): 50 pcs`},
-  {icon:"2", title:"SWEET SELECTION:", items:
-`Mini chocolate croissants: 18 pcs
-Mini donuts: 18 pcs`},
-  {icon:"3", title:"BEVERAGES:", items:
-`2 bottles of orange juice (processed)`}
-];
+let savedDocs = JSON.parse(localStorage.getItem('myInvoicesDb')) || [];
 
-function addSection(icon, title="NEW CATEGORY:", items="Item description: quantity"){
+// الدالة المساعدة لتعيين النصوص وإخفاء العناصر إذا كانت فارغة
+function setOrHide(sourceId, targetId, rowId) {
+    const val = document.getElementById(sourceId).value.trim();
+    const row = document.getElementById(rowId);
+    if (!val) {
+        row.style.display = 'none';
+    } else {
+        row.style.display = ''; // العودة للوضع الطبيعي (block أو table-row)
+        document.getElementById(targetId).textContent = val;
+    }
+}
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function addSection(icon, title="NEW CATEGORY:", items=""){
   sectionCount++;
   const id = sectionCount;
   const secIcon = (icon !== undefined) ? icon : id;
@@ -566,57 +579,54 @@ function addSection(icon, title="NEW CATEGORY:", items="Item description: quanti
       <input class="title-input" id="title-${id}" value="${title}">
       <button class="remove-btn" onclick="document.getElementById('section-${id}').remove()">✕ remove</button>
     </div>
-    <label class="small-label">Items (one per line)</label>
+    <label class="small-label">Items (one per line) <span class="note-label">(امسح الكلام لإخفاء القسم)</span></label>
     <textarea class="items" id="items-${id}">${items}</textarea>
   `;
   document.getElementById('sectionsContainer').appendChild(div);
 }
 
-defaultSections.forEach(s => addSection(s.icon, s.title, s.items));
-
-function escapeHtml(str){
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
+// بناء المعاينة (الطباعة) بإخفاء الديناميكي
 function buildPrintView(){
-  // Meta Info
-  document.getElementById('out-quoteTitle').textContent = document.getElementById('quoteTitle').value;
-  document.getElementById('out-docNumber').textContent = document.getElementById('docNumber').value;
-  document.getElementById('out-docDate').textContent = document.getElementById('docDate').value;
-  
-  const mof = document.getElementById('mofNumber').value.trim();
-  const tva = document.getElementById('tvaNumber').value.trim();
-  document.getElementById('out-mof').textContent = mof;
-  document.getElementById('out-tva').textContent = tva;
-  document.getElementById('row-mof').style.display = mof ? 'table-row' : 'none';
-  document.getElementById('row-tva').style.display = tva ? 'table-row' : 'none';
+  // Header Meta
+  setOrHide('quoteTitle', 'out-quoteTitle', 'out-quoteTitle');
+  setOrHide('docDate', 'out-docDate', 'row-docDate');
+  setOrHide('docNumber', 'out-docNumber', 'row-docNumber');
+  setOrHide('mofNumber', 'out-mof', 'row-mof');
+  setOrHide('tvaNumber', 'out-tva', 'row-tva');
 
   // Client Info
-  document.getElementById('out-clientName').textContent = document.getElementById('clientName').value;
-  document.getElementById('out-clientPhone').textContent = document.getElementById('clientPhone').value;
-  document.getElementById('out-clientEmail').textContent = document.getElementById('clientEmail').value;
-  document.getElementById('out-clientAddress').textContent = document.getElementById('clientAddress').value;
+  setOrHide('clientName', 'out-clientName', 'row-clientName');
+  setOrHide('clientPhone', 'out-clientPhone', 'row-clientPhone');
+  setOrHide('clientEmail', 'out-clientEmail', 'row-clientEmail');
+  setOrHide('clientAddress', 'out-clientAddress', 'row-clientAddress');
 
   // Delivery Info
-  document.getElementById('out-deliveryTitle').textContent = document.getElementById('deliveryIcon').value + ' ' + document.getElementById('deliveryTitle').value;
-  document.getElementById('out-deliveryTime').textContent = document.getElementById('deliveryTime').value;
-  document.getElementById('out-deliveryLine1').textContent = document.getElementById('deliveryLine1').value;
-  document.getElementById('out-deliveryLine2').textContent = document.getElementById('deliveryLine2').value;
+  const delTitle = document.getElementById('deliveryTitle').value.trim();
+  if(!delTitle) {
+      document.getElementById('deliveryBox').style.display = 'none';
+  } else {
+      document.getElementById('deliveryBox').style.display = 'block';
+      document.getElementById('out-deliveryTitle').textContent = document.getElementById('deliveryIcon').value + ' ' + delTitle;
+      setOrHide('deliveryTime', 'out-deliveryTime', 'row-deliveryTime');
+      setOrHide('deliveryLine1', 'out-deliveryLine1', 'row-deliveryLine1');
+      setOrHide('deliveryLine2', 'out-deliveryLine2', 'row-deliveryLine2');
+  }
 
   // Header Title
-  document.getElementById('out-mainHeader').textContent = 
-    document.getElementById('mainIcon').value + ' ' + document.getElementById('mainTitle').value;
+  setOrHide('mainTitle', 'out-mainHeader', 'out-mainHeader');
+  if(document.getElementById('mainTitle').value.trim()) {
+      document.getElementById('out-mainHeader').textContent = document.getElementById('mainIcon').value + ' ' + document.getElementById('mainTitle').value;
+  }
 
   // Footer & Terms
-  document.getElementById('out-footer').textContent = document.getElementById('footerText').value;
+  setOrHide('footerText', 'out-footer', 'out-footer');
   
   const terms = document.getElementById('termsText').value.trim();
-  const termsContainer = document.getElementById('out-terms-container');
   if(terms) {
     document.getElementById('out-terms').innerHTML = terms.split('\n').map(l => escapeHtml(l)).join('<br>');
-    termsContainer.style.display = 'block';
+    document.getElementById('out-terms-container').style.display = 'block';
   } else {
-    termsContainer.style.display = 'none';
+    document.getElementById('out-terms-container').style.display = 'none';
   }
 
   // Sections
@@ -624,12 +634,14 @@ function buildPrintView(){
   container.innerHTML = '';
   for(let i=1; i<=sectionCount; i++){
     const iconEl = document.getElementById('icon-'+i);
-    if(!iconEl) continue;
+    if(!iconEl) continue; // تم حذفه
+    
+    const items = document.getElementById('items-'+i).value.trim();
+    if(!items) continue; // القسم مخفي بالكامل لأنه فارغ
+
     const icon = iconEl.value;
     const title = document.getElementById('title-'+i).value;
-    const items = document.getElementById('items-'+i).value;
     const lines = items.split('\n').filter(l => l.trim() !== '');
-    
     const listHtml = lines.map(l => '• ' + escapeHtml(l)).join('<br>');
     
     const block = document.createElement('div');
@@ -643,47 +655,196 @@ function buildPrintView(){
     container.appendChild(block);
   }
 
-  // Pricing
+  // Pricing (إخفاء أسطر التسعير إذا كان حقل القيمة فارغاً)
   const pricingBody = document.getElementById('out-pricing');
-  pricingBody.innerHTML = `
-    <tr><td>${escapeHtml(document.getElementById('p1label').value)}</td><td class="amt">${escapeHtml(document.getElementById('p1amount').value)}</td></tr>
-    <tr><td>${escapeHtml(document.getElementById('p2label').value)}</td><td class="amt">${escapeHtml(document.getElementById('p2amount').value)}</td></tr>
-    <tr class="grand"><td>${escapeHtml(document.getElementById('p3label').value)}</td><td class="amt">${escapeHtml(document.getElementById('p3amount').value)}</td></tr>
-  `;
+  pricingBody.innerHTML = '';
+  for(let p=1; p<=3; p++) {
+      const amt = document.getElementById('p'+p+'amount').value.trim();
+      const lbl = document.getElementById('p'+p+'label').value.trim();
+      if(amt) {
+          const isGrand = (p===3) ? 'class="grand"' : '';
+          pricingBody.innerHTML += `<tr ${isGrand}><td>${escapeHtml(lbl)}</td><td class="amt">${escapeHtml(amt)}</td></tr>`;
+      }
+  }
 }
 
 window.addEventListener('beforeprint', buildPrintView);
 
 function showPreview(){
   buildPrintView();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('mainHint').style.display = 'none';
   const sheet = document.getElementById('printSheet');
   sheet.classList.add('visible');
   sheet.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-function darkenColor(hex, percent){
-  hex = hex.replace('#','');
-  let r = parseInt(hex.substring(0,2),16);
-  let g = parseInt(hex.substring(2,4),16);
-  let b = parseInt(hex.substring(4,6),16);
-  r = Math.max(0, Math.round(r * (1 - percent/100)));
-  g = Math.max(0, Math.round(g * (1 - percent/100)));
-  b = Math.max(0, Math.round(b * (1 - percent/100)));
-  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+// ---------------- LOCAL STORAGE APP LOGIC ---------------- //
+
+function showDashboard() {
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('printSheet').classList.remove('visible');
+    document.getElementById('mainHint').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    renderDashboard();
 }
 
-function updateStyleVars(){
-  const root = document.documentElement.style;
-  root.setProperty('--print-font-size', document.getElementById('fontSizeSelect').value + 'px');
-  root.setProperty('--print-font-weight', document.getElementById('fontWeightSelect').value);
-  const accent = document.getElementById('accentColor').value;
-  root.setProperty('--olive', accent);
-  root.setProperty('--olive-dark', darkenColor(accent, 18));
-  
-  if(document.getElementById('printSheet').classList.contains('visible')){
-    buildPrintView();
-  }
+function showEditor() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('printSheet').classList.remove('visible');
+    document.getElementById('mainHint').style.display = 'block';
+    document.getElementById('formWrap').style.display = 'block';
 }
+
+function createNewDoc() {
+    document.getElementById('currentDocId').value = '';
+    // يمكنك تصفير الحقول هنا، أو تركها تأخذ آخر ما تم كتابته لتسهيل النسخ
+    // سنقوم فقط بإنشاء معرف جديد لتعتبر وثيقة جديدة عند الحفظ
+    showEditor();
+}
+
+function saveDocument() {
+    let docId = document.getElementById('currentDocId').value;
+    if (!docId) {
+        docId = 'DOC_' + Date.now();
+        document.getElementById('currentDocId').value = docId;
+    }
+
+    const sectionsData = [];
+    for(let i=1; i<=sectionCount; i++){
+        if(document.getElementById('icon-'+i)){
+            sectionsData.push({
+                icon: document.getElementById('icon-'+i).value,
+                title: document.getElementById('title-'+i).value,
+                items: document.getElementById('items-'+i).value
+            });
+        }
+    }
+
+    const docData = {
+        id: docId,
+        type: document.getElementById('docType').value,
+        title: document.getElementById('quoteTitle').value,
+        number: document.getElementById('docNumber').value,
+        date: document.getElementById('docDate').value,
+        mof: document.getElementById('mofNumber').value,
+        tva: document.getElementById('tvaNumber').value,
+        clientName: document.getElementById('clientName').value,
+        clientPhone: document.getElementById('clientPhone').value,
+        clientEmail: document.getElementById('clientEmail').value,
+        clientAddress: document.getElementById('clientAddress').value,
+        delIcon: document.getElementById('deliveryIcon').value,
+        delTitle: document.getElementById('deliveryTitle').value,
+        delTime: document.getElementById('deliveryTime').value,
+        delLine1: document.getElementById('deliveryLine1').value,
+        delLine2: document.getElementById('deliveryLine2').value,
+        mainIcon: document.getElementById('mainIcon').value,
+        mainTitle: document.getElementById('mainTitle').value,
+        sections: sectionsData,
+        p1L: document.getElementById('p1label').value, p1A: document.getElementById('p1amount').value,
+        p2L: document.getElementById('p2label').value, p2A: document.getElementById('p2amount').value,
+        p3L: document.getElementById('p3label').value, p3A: document.getElementById('p3amount').value,
+        terms: document.getElementById('termsText').value,
+        footer: document.getElementById('footerText').value
+    };
+
+    const existingIndex = savedDocs.findIndex(d => d.id === docId);
+    if(existingIndex > -1) {
+        savedDocs[existingIndex] = docData;
+    } else {
+        savedDocs.push(docData);
+    }
+
+    localStorage.setItem('myInvoicesDb', JSON.stringify(savedDocs));
+    alert('تم الحفظ بنجاح! 💾');
+    showDashboard();
+}
+
+function loadDocument(id) {
+    const doc = savedDocs.find(d => d.id === id);
+    if(!doc) return;
+
+    document.getElementById('currentDocId').value = doc.id;
+    document.getElementById('docType').value = doc.type;
+    document.getElementById('quoteTitle').value = doc.title;
+    document.getElementById('docNumber').value = doc.number;
+    document.getElementById('docDate').value = doc.date;
+    document.getElementById('mofNumber').value = doc.mof;
+    document.getElementById('tvaNumber').value = doc.tva;
+    document.getElementById('clientName').value = doc.clientName;
+    document.getElementById('clientPhone').value = doc.clientPhone;
+    document.getElementById('clientEmail').value = doc.clientEmail;
+    document.getElementById('clientAddress').value = doc.clientAddress;
+    document.getElementById('deliveryIcon').value = doc.delIcon;
+    document.getElementById('deliveryTitle').value = doc.delTitle;
+    document.getElementById('deliveryTime').value = doc.delTime;
+    document.getElementById('deliveryLine1').value = doc.delLine1;
+    document.getElementById('deliveryLine2').value = doc.delLine2;
+    document.getElementById('mainIcon').value = doc.mainIcon;
+    document.getElementById('mainTitle').value = doc.mainTitle;
+    
+    document.getElementById('p1label').value = doc.p1L; document.getElementById('p1amount').value = doc.p1A;
+    document.getElementById('p2label').value = doc.p2L; document.getElementById('p2amount').value = doc.p2A;
+    document.getElementById('p3label').value = doc.p3L; document.getElementById('p3amount').value = doc.p3A;
+    
+    document.getElementById('termsText').value = doc.terms;
+    document.getElementById('footerText').value = doc.footer;
+
+    // إعادة بناء الأقسام
+    document.getElementById('sectionsContainer').innerHTML = '';
+    sectionCount = 0;
+    doc.sections.forEach(s => addSection(s.icon, s.title, s.items));
+
+    showEditor();
+}
+
+function deleteDocument(id) {
+    if(confirm('هل أنت متأكد من حذف هذه الوثيقة نهائياً؟ 🗑️')) {
+        savedDocs = savedDocs.filter(d => d.id !== id);
+        localStorage.setItem('myInvoicesDb', JSON.stringify(savedDocs));
+        renderDashboard();
+    }
+}
+
+function renderDashboard() {
+    const list = document.getElementById('docsList');
+    list.innerHTML = '';
+    
+    if(savedDocs.length === 0) {
+        list.innerHTML = '<div class="empty-state">لا يوجد فواتير محفوظة بعد. اضغط على New Document للبدء.</div>';
+        return;
+    }
+
+    // عرض الأحدث أولاً
+    [...savedDocs].reverse().forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'doc-card';
+        card.innerHTML = `
+            <div class="doc-info">
+                <h4>${escapeHtml(doc.title)} (${escapeHtml(doc.number)})</h4>
+                <p>Client: <b>${escapeHtml(doc.clientName)}</b> | Date: ${escapeHtml(doc.date)}</p>
+                <p style="color:var(--olive); font-weight:bold; margin-top:4px;">Total: ${escapeHtml(doc.p3A)}</p>
+            </div>
+            <div class="doc-actions">
+                <button class="btn-edit" onclick="loadDocument('${doc.id}')">✏️ Edit / Print</button>
+                <button class="btn-delete" onclick="deleteDocument('${doc.id}')">🗑️</button>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+// البدء عند فتح الصفحة
+window.onload = function() {
+    if(savedDocs.length > 0) {
+        showDashboard();
+    } else {
+        // إذا لم يكن هناك شيء محفوظ، أضف قسم افتراضي واحد وافتح صفحة التعديل
+        addSection("1", "SAVORY SELECTION", "Item 1: 10\nItem 2: 20");
+        showEditor();
+    }
+};
 </script>
 
 </body>
